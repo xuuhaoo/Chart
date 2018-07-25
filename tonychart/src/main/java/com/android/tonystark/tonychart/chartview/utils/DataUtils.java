@@ -12,7 +12,6 @@ import java.util.List;
  *
  * @author xuhao
  * @version 1.0
- * @date 2015-02-03
  */
 public class DataUtils {
 

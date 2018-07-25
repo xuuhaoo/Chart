@@ -28,7 +28,6 @@ import java.util.List;
  *
  * @author xuhao
  * @version 1.0
- * @date 2015-03-12
  */
 public class ChartViewImp extends View implements ChartView {
     private Context mContext = null;

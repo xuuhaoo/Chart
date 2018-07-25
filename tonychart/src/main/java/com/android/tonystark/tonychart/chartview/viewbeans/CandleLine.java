@@ -19,7 +19,6 @@ import java.util.List;
  *
  * @author xuhao
  * @version 1.0
- * @date 2015-03-19
  */
 public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
     //最小手指间距离

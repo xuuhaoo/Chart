@@ -7,7 +7,6 @@ import java.util.List;
  *
  * @author xuhao
  * @version 1.0
- * @date 2015-03-31
  */
 public interface ChartView {
 

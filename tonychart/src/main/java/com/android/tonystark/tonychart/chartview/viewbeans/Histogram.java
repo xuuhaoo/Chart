@@ -17,7 +17,6 @@ import java.util.List;
  *
  * @author xuhao
  * @version 1.0
- * @date 2015-03-16
  */
 public class Histogram extends ViewContainer<Histogram.HistogramBean> {
     //最小手指间距离

@@ -17,7 +17,6 @@ import java.util.List;
  *
  * @author xuhao
  * @version 1.0
- * @date 2015-03-16
  */
 public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
     //最小手指间距离

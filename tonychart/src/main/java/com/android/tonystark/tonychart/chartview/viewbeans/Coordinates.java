@@ -18,7 +18,6 @@ import java.util.List;
  *
  * @author xuhao
  * @version 1.0
- * @date 2015-03-13
  */
 public class Coordinates extends ViewContainer<Object> {
     //左边文字画笔

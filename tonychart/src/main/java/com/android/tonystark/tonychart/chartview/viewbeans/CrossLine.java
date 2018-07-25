@@ -15,8 +15,6 @@ import java.util.List;
  *
  * @author xuhao
  * @version 1.0
- * @corporation 深圳市思迪信息科技有限公司
- * @date 2015-03-31
  */
 public class CrossLine extends ViewContainer<String> {
     //线画笔

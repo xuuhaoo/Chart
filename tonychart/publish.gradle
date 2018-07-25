@@ -6,7 +6,7 @@ apply plugin: 'com.jfrog.bintray'
 publishing {
     publications {
         Production(MavenPublication) {
-            artifact("$buildDir/outputs/aar/socket-release.aar")
+            artifact("$buildDir/outputs/aar/tonychart-release.aar")
             groupId project.GROUP_ID
             artifactId project.ARTIFACT_ID
             version project.VERSION
@@ -67,13 +67,13 @@ bintray {
         name = project.NAME
         licenses = ["Apache-2.0"]
         publish = true
-        description = "Android socket library"
+        description = "Android chart library"
         publicDownloadNumbers = true
-        vcsUrl = 'https://github.com/xuuhaoo/OkSocket.git'
+        vcsUrl = 'https://github.com/xuuhaoo/Chart'
         dryRun = false
         version {
             name = project.VERSION
-            desc = "Android socket library"
+            desc = "Android chart library"
             released = new Date()
             vcsTag = project.VERSION
         }

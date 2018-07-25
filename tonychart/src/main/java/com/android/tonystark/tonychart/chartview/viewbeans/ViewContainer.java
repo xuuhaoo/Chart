@@ -14,7 +14,6 @@ import java.util.List;
  *
  * @author xuhao
  * @version 1.0
- * @date 2015-03-11
  */
 public class ViewContainer<T extends Object> {
     private ChartView mChartView;
