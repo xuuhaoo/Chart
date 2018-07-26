@@ -2,6 +2,7 @@ package com.android.didi.chart;
 
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
+import android.graphics.PointF;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,8 @@ import com.android.tonystark.tonychart.chartview.adapter.CandleCoordinateAdapter
 import com.android.tonystark.tonychart.chartview.viewbeans.BrokenLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
+import com.android.tonystark.tonychart.chartview.viewbeans.Histogram;
+import com.android.tonystark.tonychart.chartview.viewbeans.ViewContainer;
 import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -26,10 +29,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import static com.android.tonystark.tonychart.chartview.viewbeans.Histogram.HistogramBean.GREEN;
+import static com.android.tonystark.tonychart.chartview.viewbeans.Histogram.HistogramBean.RED;
+
+public class MainActivity extends AppCompatActivity implements CrossLine.OnCrossLineMoveListener {
 
     private JsonArray mJsonArray;
     private ChartViewImp mChartViewImp;
+    private ChartViewImp mChartSubViewImp;
+
     private Button mAddKBtn;
     private Button mAddNowBtn;
     private Button mDeleteBtn;
@@ -40,33 +48,39 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mChartViewImp = findViewById(R.id.chart_view);
+        mChartSubViewImp = findViewById(R.id.chart_sub_view);
+
         mAddKBtn = findViewById(R.id.add_k_btn);
         mAddNowBtn = findViewById(R.id.add_now_btn);
         mDeleteBtn = findViewById(R.id.delete_btn);
+
         inflateMockData();
-        drawBroken();
+        init();
     }
 
-    private void drawBroken() {
+    private void init() {
         mAddNowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BrokenLine brokenLine = getBrokenLine();
                 mChartViewImp.addChild(brokenLine);
                 mChartViewImp.setCoordinateScaleAdapter(new BreakLineCoordinateAdapter());
+
             }
         });
         mAddKBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 BrokenLine brokenLine = getBrokenLine();
                 mChartViewImp.addChild(brokenLine);
-                brokenLine.requestFocuse();
 
                 CandleLine candleLine = getCandleLine();
                 mChartViewImp.addChild(candleLine);
                 candleLine.requestFocuse();
+
+                mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter());
+                Histogram histogram = getHistogram();
+                mChartSubViewImp.addChild(histogram);
             }
         });
 
@@ -74,21 +88,42 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mChartViewImp.removeAllChildren();
+                mChartSubViewImp.removeAllChildren();
             }
         });
 
+        //主视图的十字线
         CrossLine crossLine = mChartViewImp.getCrossLine();
         crossLine.setLineColor(Color.parseColor("#FE7F3F"));
         crossLine.setShowLatitude(true);
+        crossLine.setOnCrossLineMoveListener(this);
         crossLine.setShowPoint(false);
+        crossLine.setFollowData(false);
 
+        //副视图的十字线
+        mChartSubViewImp.getCrossLine().setShowPoint(false);
+        mChartSubViewImp.getCrossLine().setShowLatitude(false);
+        mChartSubViewImp.getCrossLine().setShowLongitude(true);
+        mChartSubViewImp.getCrossLine().setFollowData(false);
+
+        mChartSubViewImp.followTouch(mChartViewImp);
         mChartViewImp.setCoordinateLineEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 1));
-        mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter());
         mChartViewImp.setCoordinateLineColor(Color.parseColor("#989898"));
         mChartViewImp.setCoordinateTextColor(Color.parseColor("#989898"));
         mChartViewImp.setCoordinateLatitudeNum(5);
         mChartViewImp.setCoordinateLongitudeNum(4);
         mChartViewImp.invalidate();
+    }
+
+    private Histogram getHistogram() {
+        Histogram histogram = new Histogram(this);
+        List<Histogram.HistogramBean> list = getHistogramData();
+        histogram.setDataList(list);
+        histogram.setDefaultShowPointNums(list.size());
+        histogram.setUpColor(0xfff5515f);
+        histogram.setDownColor(0xff00b78f);
+        histogram.setFill(true);
+        return histogram;
     }
 
     private CandleLine getCandleLine() {
@@ -135,6 +170,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public List<Histogram.HistogramBean> getHistogramData() {
+        List<Histogram.HistogramBean> result = new ArrayList<>();
+        Iterator<JsonElement> it = mJsonArray.iterator();
+        int index = 0;
+        while (it.hasNext()) {
+            if (index > 100) {
+                break;
+            }
+            JsonElement element = it.next();
+            JsonObject jsonObject = element.getAsJsonObject();
+            Histogram.HistogramBean bean = new Histogram.HistogramBean();
+            bean.setTurnover(jsonObject.get("volume").getAsFloat());
+            float open = (jsonObject.get("open").getAsFloat());
+            float close = (jsonObject.get("close").getAsFloat());
+            bean.setIsUp(open < close ? RED : GREEN);
+            result.add(bean);
+            index++;
+        }
+        return result;
+    }
+
     public List<CandleLine.CandleLineBean> getCandleLineData() {
         List<CandleLine.CandleLineBean> result = new ArrayList<>();
         Iterator<JsonElement> it = mJsonArray.iterator();
@@ -172,5 +228,14 @@ public class MainActivity extends AppCompatActivity {
             index++;
         }
         return result;
+    }
+
+    @Override
+    public void onCrossLineMove(int index, int drawIndex, PointF pointF) {
+        mChartSubViewImp.getCrossLine().setPointF(pointF);
+    }
+
+    @Override
+    public void onCrossLineDismiss() {
     }
 }

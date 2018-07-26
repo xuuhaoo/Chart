@@ -215,19 +215,19 @@ public class BrokenLine extends ViewContainer<String> {
         if (!isZooming) {//当不缩放的时候
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    moveDownPointF.x = event.getX();
-                    moveDownPointF.y = event.getY();
+                    mMoveDownPointF.x = event.getX();
+                    mMoveDownPointF.y = event.getY();
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    float difX = moveDownPointF.x - event.getX();
+                    float difX = mMoveDownPointF.x - event.getX();
                     int scale = (int) Math.abs(difX) / 10;
                     scale = scale < 1 ? 1 : scale;
                     if (Math.abs(difX) >= MIN_MOVE_DISTANCE) {
                         move(difX, scale);
                         calculateData();
                     }
-                    moveDownPointF.x = event.getX();
-                    moveDownPointF.y = event.getY();
+                    mMoveDownPointF.x = event.getX();
+                    mMoveDownPointF.y = event.getY();
                     break;
                 case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:
@@ -236,7 +236,7 @@ public class BrokenLine extends ViewContainer<String> {
         }
     }
 
-    private PointF moveDownPointF = new PointF();
+    private PointF mMoveDownPointF = new PointF();
 
     /**
      * 移动

@@ -39,4 +39,9 @@
         android:layout_width="match_parent"
         android:layout_height="200dp" />
 
+    <com.android.tonystark.tonychart.chartview.views.ChartViewImp
+        android:id="@+id/chart_sub_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>

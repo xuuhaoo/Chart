@@ -1,5 +1,10 @@
 package com.android.tonystark.tonychart.chartview.viewbeans;
 
+import android.view.MotionEvent;
+import android.view.View;
+
+import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
+
 import java.util.List;
 
 /**
@@ -32,5 +37,10 @@ public interface ChartView {
 
     boolean isSnapshotOpen();
 
+    boolean onTouchEvent(MotionEvent event);
+
+    void followTouch(ChartViewImp view);
+
+    void loseFollow(ChartViewImp view);
 
 }

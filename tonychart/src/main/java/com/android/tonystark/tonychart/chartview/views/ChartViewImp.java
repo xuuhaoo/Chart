@@ -32,6 +32,8 @@ import java.util.List;
  */
 public class ChartViewImp extends View implements ChartView {
     private Context mContext = null;
+    //手势跟随View
+    private ChartView mFollowView;
     //画布容器
     private ViewContainer<Object> mViewContainer = null;
     //坐标系
@@ -44,9 +46,9 @@ public class ChartViewImp extends View implements ChartView {
     private Bitmap mSnapshotBitmap = null;
     //快照绘图画布
     private Canvas mSnapshotCanvas = null;
-
+    //是否有底部间隙
     private boolean isHasBottomBlack = true;
-
+    //左边间隙
     private int coordinateMarginLeft = 0;
     //手指摁下时的xy点
     private PointF mDownPointF = new PointF();
@@ -121,6 +123,15 @@ public class ChartViewImp extends View implements ChartView {
         }
         mForceFlushFocusChanged = true;
         invalidate();
+    }
+
+    public void followTouch(ChartViewImp view) {
+        view.mFollowView = this;
+    }
+
+    @Override
+    public void loseFollow(ChartViewImp view) {
+        view.mFollowView = null;
     }
 
     /**
@@ -524,6 +535,10 @@ public class ChartViewImp extends View implements ChartView {
         }
 
         invalidate();
+
+        if (mFollowView != null) {
+            mFollowView.onTouchEvent(event);
+        }
         return true;
     }
 
@@ -628,6 +643,9 @@ public class ChartViewImp extends View implements ChartView {
         }
     }
 
+    /**
+     * 设置底部间隙
+     */
     public void setHasBottomScaleBlack(boolean has) {
         this.isHasBottomBlack = has;
     }
@@ -636,6 +654,9 @@ public class ChartViewImp extends View implements ChartView {
         return mCrossLine;
     }
 
+    public void followView(ChartView followView) {
+        mFollowView = followView;
+    }
 
     private float spacing(MotionEvent event) {
         float x = Math.abs(event.getX() - mDownPointF.x);

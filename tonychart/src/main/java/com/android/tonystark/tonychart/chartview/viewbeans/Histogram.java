@@ -200,17 +200,15 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
                 if (event.getPointerCount() >= 2) {
                     float spacing = spacing(event) - mDistance;
                     if (Math.abs(spacing) >= MIN_FINGER_DISTANCE) {
-                        int scale = (int) Math.abs(spacing) / 10;
-                        scale = scale < 1 ? 1 : scale;
+                        int scale = (int) Math.abs(spacing) / 4;
                         mDistance = spacing(event);
                         if (spacing < 0) {
-                            zoomOut(scale);
                             //缩小
-//                            if (zoomOut()) calculateDrawHistogramIndex(event, -1);//-1代表了缩小
+                            if (zoomOut(scale))
+                                calculateDrawHistogramIndex(event, scale, -1);//-1代表了缩小
                         } else {
-                            zoomIn(scale);
                             //放大
-//                            if (zoomIn()) calculateDrawHistogramIndex(event, 1);//1代表了放大
+                            if (zoomIn(scale)) calculateDrawHistogramIndex(event, scale, 1);//1代表了放大
                         }
                         //计算最大最小值
                         calculateData();
@@ -218,7 +216,6 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
                 }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
-//                isZooming = false;
                 break;
             case MotionEvent.ACTION_UP:
                 //标志位复位放在这里是因为很用户双手离开屏幕时可能还会移动一下，会先触发ACTION_POINTER_UP,再触发ACTION_UP,
@@ -256,30 +253,13 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
      * @return 表示是否进行了放大, true代表showPointNums进行了--;
      */
     private boolean zoomIn(int scale) {
-//        if (mShownPointNums >= mMinShownPointNums) {
-//            //减少主子根数
-//            mShownPointNums--;
-//            mShownPointNums = mShownPointNums < mMinShownPointNums ? mMinShownPointNums : mShownPointNums;
-//            return true;
-//        } else {
-//            //此时显示的主子数应该等于最小主子数
-//            mShownPointNums = mMinShownPointNums;
-//            return false;
-//        }
         if (mShownPointNums > mMinShownPointNums) {
-            //减少蜡烛根数
-            mShownPointNums -= (6 * scale);
-            mDrawPointIndex += (3 * scale);
-            if (mDrawPointIndex + mShownPointNums < mZoomHistogramIndex) {
-                mDrawPointIndex += (6 * scale);
-            }
+            //减少点数
+            mShownPointNums = mShownPointNums - scale;
             mShownPointNums = mShownPointNums < mMinShownPointNums ? mMinShownPointNums : mShownPointNums;
-            //越界判断
-            mDrawPointIndex = mDrawPointIndex >= mZoomHistogramIndex ? mZoomHistogramIndex - 3 : mDrawPointIndex;
-            mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
             return true;
         } else {
-            //此时显示的蜡烛数应该等于最小蜡烛数
+            //此时显示的点数应该等于最小点数
             mShownPointNums = mMinShownPointNums;
             return false;
         }
@@ -291,25 +271,10 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
      * @return 标识是否进行了缩小, true代表showPointNums进行了++;
      */
     private boolean zoomOut(int scale) {
-//        if (mShownPointNums <= mDefaultShowPointNums) {
-//            //增加主子根数
-//            mShownPointNums++;
-//            mShownPointNums = mShownPointNums > mDefaultShowPointNums ? mDefaultShowPointNums : mShownPointNums;
-//            return true;
-//        } else {
-//            mShownPointNums = mDefaultShowPointNums;
-//            return false;
-//        }
-
         if (mShownPointNums < mDefaultShowPointNums) {
-            //增加蜡烛根数
-            mShownPointNums += (6 * scale);
-            mDrawPointIndex -= (3 * scale);
-
+            //增加点根数
+            mShownPointNums = mShownPointNums + scale;
             mShownPointNums = mShownPointNums > mDefaultShowPointNums ? mDefaultShowPointNums : mShownPointNums;
-            //越界判断
-            mDrawPointIndex = mDrawPointIndex >= mDataList.size() - mDefaultShowPointNums - 1 ? mDataList.size() - mDefaultShowPointNums - 1 : mDrawPointIndex;
-            mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
             return true;
         } else {
             mShownPointNums = mDefaultShowPointNums;
@@ -349,7 +314,7 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
     /**
      * 计算绘画主子的起始值
      */
-    private void calculateDrawHistogramIndex(MotionEvent event, int zoomType) {
+    private void calculateDrawHistogramIndex(MotionEvent event, int scale, int zoomType) {
         //计算左边应消失的根数,从而改变了右边消失的根数,因为总消失根数不变
         int zoomHistogramIndexTemp = getZoomCenterHistogramIndex(event);
 
@@ -358,18 +323,18 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
                 //目标左移,需要向右纠正,不改变绘图起始坐标,就会让图右移,因为显示条数在变少
             } else if (zoomHistogramIndexTemp - mZoomHistogramIndex < 0) {
                 //目标右移,需要向左纠正
-                mDrawPointIndex = mDrawPointIndex + 1;
+                mDrawPointIndex = mDrawPointIndex + scale;
             }
         } else if (zoomType == -1) {//缩小
             if (zoomHistogramIndexTemp - mZoomHistogramIndex > 0) {
                 //目标左移,需要向右纠正
-                mDrawPointIndex = mDrawPointIndex - 1;
+                mDrawPointIndex = mDrawPointIndex - scale;
             } else if (zoomHistogramIndexTemp - mZoomHistogramIndex < 0) {
                 //目标右移,需要向左纠正,不改变绘图其实坐标,就会让图左移,因为现实条数增多
             }
         }
         //越界判断
-        mDrawPointIndex = mDrawPointIndex >= mDataList.size() ? mDataList.size() - 1 : mDrawPointIndex;
+        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums - 1 : mDrawPointIndex;
         mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
 
     }
@@ -447,11 +412,12 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
     @Override
     public float[] calculateExtremeYWhenFocused() {
         List<String> dataList = new ArrayList<>();
-        for (int i = mDrawPointIndex; i < mShownPointNums; i++) {
+        for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
             HistogramBean bean = mDataList.get(i);
             dataList.add(bean.getTurnover() + "");
         }
         float[] result = DataUtils.getExtremeNumber(dataList);
+        result[0] = 0;
         return result;
     }
 }

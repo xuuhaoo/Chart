@@ -39,6 +39,8 @@ public class CrossLine extends ViewContainer<String> {
     private boolean isShowLatitude = true;
     //是否显示经线
     private boolean isShowLongitude = true;
+    //是否十字交叉点跟随数据
+    private boolean isFollowData = true;
     //每个点的宽度
     private float mPointWidth = 0;
     //十字拖动监听器
@@ -121,17 +123,19 @@ public class CrossLine extends ViewContainer<String> {
     //绘制纬线
     private void drawLatitude(Canvas canvas, int index) {
         float y = mPointF.y;
-        if (!mDataList.isEmpty() && index <= mDataList.size() - 1) {
-            try {
-                y = (1f - (Float.parseFloat(mDataList.get(index + mDrawPointIndex)) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
-            } catch (NumberFormatException e) {
-                y = mPointF.y;
-            }
-        } else if (!mDataList.isEmpty()) {
-            try {
-                y = (1f - (Float.parseFloat(mDataList.get(mDataList.size() - 1)) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
-            } catch (NumberFormatException e) {
-                y = mPointF.y;
+        if (isFollowData) {
+            if (!mDataList.isEmpty() && index <= mDataList.size() - 1) {
+                try {
+                    y = (1f - (Float.parseFloat(mDataList.get(index + mDrawPointIndex)) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+                } catch (NumberFormatException e) {
+                    y = mPointF.y;
+                }
+            } else if (!mDataList.isEmpty()) {
+                try {
+                    y = (1f - (Float.parseFloat(mDataList.get(mDataList.size() - 1)) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+                } catch (NumberFormatException e) {
+                    y = mPointF.y;
+                }
             }
         }
         canvas.drawLine(mCoordinateMarginLeft, y, mCoordinateWidth, y, mLinePaint);
@@ -140,12 +144,14 @@ public class CrossLine extends ViewContainer<String> {
     //绘制经线
     private void drawLongitude(Canvas canvas, int index) {
         float x = mPointF.x;
-        if (!mDataList.isEmpty() && index <= mDataList.size() - 1) {
-            x = index * mPointWidth + mCoordinateMarginLeft;
-        } else if (!mDataList.isEmpty()) {
-            x = (mDataList.size() - 1) * mPointWidth + mCoordinateMarginLeft;
+        if (isFollowData) {
+            if (!mDataList.isEmpty() && index <= mDataList.size() - 1) {
+                x = index * mPointWidth + mCoordinateMarginLeft;
+            } else if (!mDataList.isEmpty()) {
+                x = (mDataList.size() - 1) * mPointWidth + mCoordinateMarginLeft;
+            }
+            x += mSinglePointOffset;
         }
-        x += mSinglePointOffset;
         canvas.drawLine(x, 0, x, mCoordinateHeight, mLinePaint);
     }
 
@@ -195,7 +201,7 @@ public class CrossLine extends ViewContainer<String> {
                 mPointF.y = event.getY();
                 setShow(true);
                 if (mOnCrossLineMoveListener != null) {
-                    mOnCrossLineMoveListener.onCrossLineMove(index, mDrawPointIndex);
+                    mOnCrossLineMoveListener.onCrossLineMove(index, mDrawPointIndex, mPointF);
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -208,7 +214,7 @@ public class CrossLine extends ViewContainer<String> {
                 }
                 mPointF.y = event.getY();
                 if (mOnCrossLineMoveListener != null) {
-                    mOnCrossLineMoveListener.onCrossLineMove(index, mDrawPointIndex);
+                    mOnCrossLineMoveListener.onCrossLineMove(index, mDrawPointIndex, mPointF);
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
@@ -222,7 +228,7 @@ public class CrossLine extends ViewContainer<String> {
     }
 
     public interface OnCrossLineMoveListener {
-        void onCrossLineMove(int index, int drawIndex);
+        void onCrossLineMove(int index, int drawIndex, PointF pointF);
 
         void onCrossLineDismiss();
     }
@@ -302,4 +308,10 @@ public class CrossLine extends ViewContainer<String> {
     public void setSinglePointOffset(float singlePointOffset) {
         this.mSinglePointOffset = singlePointOffset;
     }
+
+    public void setFollowData(boolean followData) {
+        isFollowData = followData;
+    }
+
+
 }
