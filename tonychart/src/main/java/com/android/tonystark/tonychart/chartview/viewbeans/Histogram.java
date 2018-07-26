@@ -411,7 +411,11 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
 
     @Override
     public float[] calculateExtremeYWhenFocused() {
-        if (mDataList != null && mDataList.size() > mDrawPointIndex) {
+        if (mZoomAndMoveCalculateInterface != null) {
+            float yMax = mZoomAndMoveCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
+            float yMin = mZoomAndMoveCalculateInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
+            return new float[]{yMin, yMax};
+        } else if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             List<String> dataList = new ArrayList<>();
             for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
                 HistogramBean bean = mDataList.get(i);

@@ -458,7 +458,11 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
 
     @Override
     public float[] calculateExtremeYWhenFocused() {
-        if (mDataList != null && mDataList.size() > mDrawPointIndex) {
+        if (mZoomAndMoveCalculateInterface != null) {
+            float yMax = mZoomAndMoveCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
+            float yMin = mZoomAndMoveCalculateInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
+            return new float[]{yMin, yMax};
+        } else if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             float min = mDataList.get(mDrawPointIndex).getLowPrice();
             float max = mDataList.get(mDrawPointIndex).getHeightPrice();
             for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {

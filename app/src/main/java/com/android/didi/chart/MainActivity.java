@@ -14,6 +14,7 @@ import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.Histogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.MACDHistogram;
+import com.android.tonystark.tonychart.chartview.viewbeans.ViewContainer;
 import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -250,6 +251,18 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         candleLine.setShowMaxPrice(false);
         //设置K线组件是否显示屏幕中的最低价
         candleLine.setShowMinPrice(false);
+
+        candleLine.setZoomAndMoveCalculateInterface(new ViewContainer.ZoomAndMoveCalculateInterface() {
+            @Override
+            public float onCalculateMax(int drawPointIndex, int showPointNums) {
+                return 0;
+            }
+
+            @Override
+            public float onCalculateMin(int drawPointIndex, int showPointNums) {
+                return 0;
+            }
+        });
         return candleLine;
     }
 
