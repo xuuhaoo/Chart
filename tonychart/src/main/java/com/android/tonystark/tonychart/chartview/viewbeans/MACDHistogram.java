@@ -263,30 +263,13 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
      * @return 表示是否进行了放大, true代表showPointNums进行了--;
      */
     private boolean zoomIn(int scale) {
-//        if (mShownPointNums >= mMinShownPointNums) {
-//            //减少主子根数
-//            mShownPointNums--;
-//            mShownPointNums = mShownPointNums < mMinShownPointNums ? mMinShownPointNums : mShownPointNums;
-//            return true;
-//        } else {
-//            //此时显示的主子数应该等于最小主子数
-//            mShownPointNums = mMinShownPointNums;
-//            return false;
-//        }
         if (mShownPointNums > mMinShownPointNums) {
-            //减少蜡烛根数
-            mShownPointNums -= (6 * scale);
-            mDrawPointIndex += (3 * scale);
-            if (mDrawPointIndex + mShownPointNums < mZoomHistogramIndex) {
-                mDrawPointIndex += (6 * scale);
-            }
+            //减少点数
+            mShownPointNums = mShownPointNums - scale;
             mShownPointNums = mShownPointNums < mMinShownPointNums ? mMinShownPointNums : mShownPointNums;
-            //越界判断
-            mDrawPointIndex = mDrawPointIndex >= mZoomHistogramIndex ? mZoomHistogramIndex - 3 : mDrawPointIndex;
-            mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
             return true;
         } else {
-            //此时显示的蜡烛数应该等于最小蜡烛数
+            //此时显示的点数应该等于最小点数
             mShownPointNums = mMinShownPointNums;
             return false;
         }
@@ -298,31 +281,17 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
      * @return 标识是否进行了缩小, true代表showPointNums进行了++;
      */
     private boolean zoomOut(int scale) {
-//        if (mShownPointNums <= mDefaultShowPointNums) {
-//            //增加主子根数
-//            mShownPointNums++;
-//            mShownPointNums = mShownPointNums > mDefaultShowPointNums ? mDefaultShowPointNums : mShownPointNums;
-//            return true;
-//        } else {
-//            mShownPointNums = mDefaultShowPointNums;
-//            return false;
-//        }
-
         if (mShownPointNums < mDefaultShowPointNums) {
-            //增加蜡烛根数
-            mShownPointNums += (6 * scale);
-            mDrawPointIndex -= (3 * scale);
-
+            //增加点根数
+            mShownPointNums = mShownPointNums + scale;
             mShownPointNums = mShownPointNums > mDefaultShowPointNums ? mDefaultShowPointNums : mShownPointNums;
-            //越界判断
-            mDrawPointIndex = mDrawPointIndex >= mDataList.size() - mDefaultShowPointNums - 1 ? mDataList.size() - mDefaultShowPointNums - 1 : mDrawPointIndex;
-            mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
             return true;
         } else {
             mShownPointNums = mDefaultShowPointNums;
             return false;
         }
     }
+
 
     /**
      * 计算两指距离
@@ -483,12 +452,16 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
 
     @Override
     public float[] calculateExtremeYWhenFocused() {
-        List<String> dataList = new ArrayList<>();
-        for (int i = mDrawPointIndex; i < mShownPointNums; i++) {
-            MACDBean bean = mDataList.get(i);
-            dataList.add(bean.getMacd() + "");
+        if (mDataList != null && mDataList.size() > mDrawPointIndex) {
+            List<String> dataList = new ArrayList<>();
+            for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
+                MACDBean bean = mDataList.get(i);
+                dataList.add(bean.getMacd() + "");
+            }
+            float[] result = DataUtils.getExtremeNumber(dataList);
+            return result;
+
         }
-        float[] result = DataUtils.getExtremeNumber(dataList);
-        return result;
+        return new float[]{0, 0};
     }
 }

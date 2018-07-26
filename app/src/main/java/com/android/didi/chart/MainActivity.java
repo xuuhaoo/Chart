@@ -14,6 +14,7 @@ import com.android.tonystark.tonychart.chartview.viewbeans.BrokenLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.Histogram;
+import com.android.tonystark.tonychart.chartview.viewbeans.MACDHistogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.ViewContainer;
 import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
 import com.google.gson.JsonArray;
@@ -65,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 BrokenLine brokenLine = getBrokenLine();
                 mChartViewImp.addChild(brokenLine);
                 mChartViewImp.setCoordinateScaleAdapter(new BreakLineCoordinateAdapter());
+
+                MACDHistogram macdHistogram = getMACD();
+                mChartSubViewImp.addChild(macdHistogram);
 
             }
         });
@@ -119,6 +123,17 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mChartViewImp.setCoordinateLatitudeNum(5);
         mChartViewImp.setCoordinateLongitudeNum(4);
         mChartViewImp.invalidate();
+    }
+
+    private MACDHistogram getMACD() {
+        MACDHistogram macdHistogram = new MACDHistogram(this);
+        List<MACDHistogram.MACDBean> list = getMACDLineData();
+        macdHistogram.setDataList(list);
+        macdHistogram.setDefaultShowPointNums(list.size());
+        macdHistogram.setUpColor(0xfff5515f);
+        macdHistogram.setDownColor(0xff00b78f);
+        macdHistogram.setFill(true);
+        return macdHistogram;
     }
 
     private Histogram getHistogram() {
@@ -213,6 +228,23 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                     jsonObject.get("open").getAsFloat(),
                     jsonObject.get("close").getAsFloat());
             bean.setTimeMills(jsonObject.get("timesign").getAsLong() * 1000);
+            result.add(bean);
+            index++;
+        }
+        return result;
+    }
+
+    public List<MACDHistogram.MACDBean> getMACDLineData() {
+        List<MACDHistogram.MACDBean> result = new ArrayList<>();
+        Iterator<JsonElement> it = mJsonArray.iterator();
+        int index = 0;
+        while (it.hasNext()) {
+            if (index > 100) {
+                break;
+            }
+            JsonElement element = it.next();
+            JsonObject jsonObject = element.getAsJsonObject();
+            MACDHistogram.MACDBean bean = new MACDHistogram.MACDBean(jsonObject.get("open").getAsFloat());
             result.add(bean);
             index++;
         }
