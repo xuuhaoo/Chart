@@ -93,7 +93,6 @@ public class Coordinates extends ViewContainer<Object> {
         mBottomTextPaint.setTextSize(getPixelSp(9));
         mBottomTextPaint.setAntiAlias(true);
         mBottomTextPaint.setColor(ContextCompat.getColor(mContext, R.color.tiny_gray));
-
         //初始化空隙,该空隙用于文字与边距和纬线之间的距离
         mSpace = getPixelSp(2);
     }
@@ -347,4 +346,13 @@ public class Coordinates extends ViewContainer<Object> {
     public void setShownPointNums(int shownPointNums) {
         mShownPointNums = shownPointNums;
     }
+
+    public float getLeftTextWidth(int charCount) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < charCount; i++) {
+            sb.append("0");
+        }
+        return mSpace + mLeftTextPaint.measureText(sb.toString());
+    }
+
 }

@@ -173,11 +173,11 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
     private void move(float difX, int scale) {
         if (difX > 0) {//手指向左移动
             if ((mDrawPointIndex + mShownPointNums) <= mDataList.size() - 1) {
-                mDrawPointIndex = mDrawPointIndex + 1 * scale;
+                mDrawPointIndex = mDrawPointIndex + scale;
             }
         } else if (difX < 0) {//手指向右移动
             if (mDrawPointIndex > 0) {
-                mDrawPointIndex = mDrawPointIndex - 1 * scale;
+                mDrawPointIndex = mDrawPointIndex - scale;
             }
         }
         //越界判断

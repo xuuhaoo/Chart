@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 描述：柱状图
+ * 描述：MACD柱状图
  *
  * @author xuhao
  * @version 1.0
  */
-public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
+public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
     //最小手指间距离
     private static final int MIN_FINGER_DISTANCE = 10;
     //最小移动距离
@@ -52,7 +52,7 @@ public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
      * @param YMax 坐标系中最大值
      * @param YMin 坐标系中最小值
      */
-    public MacdHistogram(Context context, float YMax, float YMin) {
+    public MACDHistogram(Context context, float YMax, float YMin) {
         super(context);
         this.mYMax = YMax;
         this.mYMin = YMin;
@@ -60,7 +60,7 @@ public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
         init();
     }
 
-    public MacdHistogram(Context context) {
+    public MACDHistogram(Context context) {
         super(context);
         //初始化线画笔
         init();
@@ -89,7 +89,7 @@ public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
                 PointF rightBottomPoint;
                 PointF leftTopPoint;
                 for (int i = 0; i < mShownPointNums && i < mDataList.size(); i++) {
-                    MacdBean bean = mDataList.get(i + mDrawPointIndex);
+                    MACDBean bean = mDataList.get(i + mDrawPointIndex);
                     leftTopPoint = getLeftTopPoint(i, bean);
                     rightBottomPoint = getRightBottomPoint(i, bean);
                     if (bean.getMacd() > 0) {
@@ -109,7 +109,7 @@ public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
         }
     }
 
-    private PointF getLeftTopPoint(int index, MacdBean bean) {
+    private PointF getLeftTopPoint(int index, MACDBean bean) {
         PointF pointF = new PointF();
         mSpace = mPointWidth / 7;
 
@@ -126,7 +126,7 @@ public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
         return pointF;
     }
 
-    private PointF getRightBottomPoint(int index, MacdBean bean) {
+    private PointF getRightBottomPoint(int index, MACDBean bean) {
         PointF pointF = new PointF();
         mPointWidth = (mCoordinateWidth - mCoordinateMarginLeft) / mShownPointNums;
         mSpace = mPointWidth / 7;
@@ -182,11 +182,11 @@ public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
     private void move(float difX, int scale) {
         if (difX > 0) {//手指向左移动
             if ((mDrawPointIndex + mShownPointNums) <= mDataList.size() - 1) {
-                mDrawPointIndex = mDrawPointIndex + 1 * scale;
+                mDrawPointIndex = mDrawPointIndex + scale;
             }
         } else if (difX < 0) {//手指向右移动
             if (mDrawPointIndex > 0) {
-                mDrawPointIndex = mDrawPointIndex - 1 * scale;
+                mDrawPointIndex = mDrawPointIndex - scale;
             }
         }
         //越界判断
@@ -209,17 +209,15 @@ public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
                 if (event.getPointerCount() >= 2) {
                     float spacing = spacing(event) - mDistance;
                     if (Math.abs(spacing) >= MIN_FINGER_DISTANCE) {
-                        int scale = (int) Math.abs(spacing) / 10;
-                        scale = scale < 1 ? 1 : scale;
+                        int scale = (int) Math.abs(spacing) / 4;
                         mDistance = spacing(event);
                         if (spacing < 0) {
-                            zoomOut(scale);
                             //缩小
-//                            if (zoomOut()) calculateDrawHistogramIndex(event, -1);//-1代表了缩小
+                            if (zoomOut(scale))
+                                calculateDrawHistogramIndex(event, scale, -1);//-1代表了缩小
                         } else {
-                            zoomIn(scale);
                             //放大
-//                            if (zoomIn()) calculateDrawHistogramIndex(event, 1);//1代表了放大
+                            if (zoomIn(scale)) calculateDrawHistogramIndex(event, scale, 1);//1代表了放大
                         }
                         //计算最大最小值
                         calculateData();
@@ -358,7 +356,7 @@ public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
     /**
      * 计算绘画主子的起始值
      */
-    private void calculateDrawHistogramIndex(MotionEvent event, int zoomType) {
+    private void calculateDrawHistogramIndex(MotionEvent event, int scale, int zoomType) {
         //计算左边应消失的根数,从而改变了右边消失的根数,因为总消失根数不变
         int zoomHistogramIndexTemp = getZoomCenterHistogramIndex(event);
 
@@ -367,26 +365,26 @@ public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
                 //目标左移,需要向右纠正,不改变绘图起始坐标,就会让图右移,因为显示条数在变少
             } else if (zoomHistogramIndexTemp - mZoomHistogramIndex < 0) {
                 //目标右移,需要向左纠正
-                mDrawPointIndex = mDrawPointIndex + 1;
+                mDrawPointIndex = mDrawPointIndex + scale;
             }
         } else if (zoomType == -1) {//缩小
             if (zoomHistogramIndexTemp - mZoomHistogramIndex > 0) {
                 //目标左移,需要向右纠正
-                mDrawPointIndex = mDrawPointIndex - 1;
+                mDrawPointIndex = mDrawPointIndex - scale;
             } else if (zoomHistogramIndexTemp - mZoomHistogramIndex < 0) {
                 //目标右移,需要向左纠正,不改变绘图其实坐标,就会让图左移,因为现实条数增多
             }
         }
         //越界判断
-        mDrawPointIndex = mDrawPointIndex >= mDataList.size() ? mDataList.size() - 1 : mDrawPointIndex;
+        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums - 1 : mDrawPointIndex;
         mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
 
     }
 
-    public static class MacdBean {
+    public static class MACDBean {
         private float macd = 0f;
 
-        public MacdBean(float macd) {
+        public MACDBean(float macd) {
             this.macd = macd;
         }
 
@@ -487,7 +485,7 @@ public class MacdHistogram extends ViewContainer<MacdHistogram.MacdBean> {
     public float[] calculateExtremeYWhenFocused() {
         List<String> dataList = new ArrayList<>();
         for (int i = mDrawPointIndex; i < mShownPointNums; i++) {
-            MacdBean bean = mDataList.get(i);
+            MACDBean bean = mDataList.get(i);
             dataList.add(bean.getMacd() + "");
         }
         float[] result = DataUtils.getExtremeNumber(dataList);

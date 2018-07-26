@@ -107,7 +107,12 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mChartSubViewImp.getCrossLine().setShowLongitude(true);
         mChartSubViewImp.getCrossLine().setFollowData(false);
 
+        //副图跟随滑动
         mChartSubViewImp.followTouch(mChartViewImp);
+        //设置左边间距
+        mChartSubViewImp.setMarginLeft((int) mChartViewImp.getCoordinateLeftTextWidth(7));
+        mChartViewImp.setMarginLeft((int) mChartViewImp.getCoordinateLeftTextWidth(7));
+        //设置坐标系样式
         mChartViewImp.setCoordinateLineEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 1));
         mChartViewImp.setCoordinateLineColor(0xff989898);
         mChartViewImp.setCoordinateTextColor(0xff989898);

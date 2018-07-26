@@ -462,7 +462,7 @@ public class ChartViewImp extends View implements ChartView {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(isFollowed){
+        if (isFollowed) {
             return true;
         }
         onTouchEventPrivate(event);
@@ -593,6 +593,13 @@ public class ChartViewImp extends View implements ChartView {
         if (mCoordinates != null) {
             mCoordinates.setLatitudeNums(latitude);
         }
+    }
+
+    public float getCoordinateLeftTextWidth(int charCount) {
+        if (mCoordinates != null) {
+            return mCoordinates.getLeftTextWidth(charCount);
+        }
+        return 0;
     }
 
     /**
