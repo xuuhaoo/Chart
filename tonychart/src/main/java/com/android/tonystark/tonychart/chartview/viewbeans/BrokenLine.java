@@ -127,7 +127,9 @@ public class BrokenLine extends ViewContainer<String> {
                 PointF normalPoint = null;//普通坐标点,有可能会在放大缩小左右移动时出现脏数据0,0
                 boolean isLastPoint = false; //是否是屏幕能容纳的最后一个点
                 for (int i = 0; i < mShownPointNums && i < mDataList.size(); i++) {
-                    if (TextUtils.isEmpty(mDataList.get(i + mDrawPointIndex)) || TextUtils.equals(mDataList.get(i + mDrawPointIndex), "null")) {
+                    if (TextUtils.isEmpty(mDataList.get(i + mDrawPointIndex)) ||
+                            "null".equalsIgnoreCase(mDataList.get(i + mDrawPointIndex)) ||
+                            mDataList.get(i + mDrawPointIndex) == null) {
                         continue;
                     }
                     normalPoint = getCoordinatePoint(i + mDrawPointIndex, i);
@@ -304,8 +306,8 @@ public class BrokenLine extends ViewContainer<String> {
                 mYMax = mZoomAndMoveCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
                 mYMin = mZoomAndMoveCalculateInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
             } else if (mDataList.size() > mDrawPointIndex) {
-                float min = Float.parseFloat(mDataList.get(mDrawPointIndex));
-                float max = Float.parseFloat(mDataList.get(mDrawPointIndex));
+                float min = DataUtils.parseString2Float(mDataList.get(mDrawPointIndex));
+                float max = DataUtils.parseString2Float(mDataList.get(mDrawPointIndex));
                 for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
                     float value = Float.parseFloat(mDataList.get(i));
                     min = value < min && value > 0 ? value : min;
@@ -509,6 +511,9 @@ public class BrokenLine extends ViewContainer<String> {
         if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             List<String> dataList = new ArrayList<>();
             for (int i = mDrawPointIndex; i < mDrawPointIndex + mShownPointNums; i++) {
+                if (TextUtils.isEmpty(mDataList.get(i)) || "null".equalsIgnoreCase(mDataList.get(i)) || mDataList.get(i) == null) {
+                    continue;
+                }
                 dataList.add(mDataList.get(i));
             }
             return DataUtils.getExtremeNumber(dataList);

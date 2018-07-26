@@ -1,5 +1,6 @@
 package com.android.tonystark.tonychart.chartview.utils;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 
@@ -14,6 +15,18 @@ import java.util.List;
  * @version 1.0
  */
 public class DataUtils {
+
+    public static float parseString2Float(String value) {
+        if (value == null || TextUtils.isEmpty(value) || "null".equalsIgnoreCase(value)) {
+            return 0;
+        }
+        try {
+            return Float.parseFloat(value);
+        } catch (NumberFormatException e) {
+            Log.e("parseString2Float", "parseString2Float error:" + e.getMessage());
+            return 0;
+        }
+    }
 
     /**
      * 求出数据极值
