@@ -448,7 +448,6 @@ public class ChartViewImp extends View implements ChartView {
     public boolean onTouchEvent(MotionEvent event) {
         if (mFocusedView != null) {
             //更新十字线
-            //设置十字线
             if (mCrossLine != null) {
                 //设置十字线数据显示个数,跟随焦点组件
                 mCrossLine.setShownPointNums(mFocusedView.getShownPointNums());
@@ -528,6 +527,9 @@ public class ChartViewImp extends View implements ChartView {
         return true;
     }
 
+    /**
+     * 快照是否打开
+     */
     public boolean isSnapshotOpen() {
         return isSnapshotOpen;
     }
@@ -617,6 +619,9 @@ public class ChartViewImp extends View implements ChartView {
         }
     }
 
+    /**
+     * 设置坐标系数据
+     */
     public void setCoordinateDataList(List dataList) {
         if (mCoordinates != null) {
             mCoordinates.setDataList(dataList);

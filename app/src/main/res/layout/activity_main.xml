@@ -15,16 +15,22 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/add_btn"
+            android:id="@+id/add_k_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="添加" />
+            android:text="添加K线及MA线" />
+
+        <Button
+            android:id="@+id/add_now_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="添加分时线" />
 
         <Button
             android:id="@+id/delete_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="删除" />
+            android:text="删除所有" />
 
     </LinearLayout>
 

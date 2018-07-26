@@ -30,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     private JsonArray mJsonArray;
     private ChartViewImp mChartViewImp;
-    private Button mAddBtn;
+    private Button mAddKBtn;
+    private Button mAddNowBtn;
     private Button mDeleteBtn;
 
     @Override
@@ -39,20 +40,33 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mChartViewImp = findViewById(R.id.chart_view);
-        mAddBtn = findViewById(R.id.add_btn);
+        mAddKBtn = findViewById(R.id.add_k_btn);
+        mAddNowBtn = findViewById(R.id.add_now_btn);
         mDeleteBtn = findViewById(R.id.delete_btn);
         inflateMockData();
         drawBroken();
     }
 
     private void drawBroken() {
-
-        mAddBtn.setOnClickListener(new View.OnClickListener() {
+        mAddNowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BrokenLine brokenLine = getBrokenLine();
                 mChartViewImp.addChild(brokenLine);
                 mChartViewImp.setCoordinateScaleAdapter(new BreakLineCoordinateAdapter());
+            }
+        });
+        mAddKBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                BrokenLine brokenLine = getBrokenLine();
+                mChartViewImp.addChild(brokenLine);
+                brokenLine.requestFocuse();
+
+                CandleLine candleLine = getCandleLine();
+                mChartViewImp.addChild(candleLine);
+                candleLine.requestFocuse();
             }
         });
 
@@ -62,15 +76,6 @@ public class MainActivity extends AppCompatActivity {
                 mChartViewImp.removeAllChildren();
             }
         });
-
-        BrokenLine brokenLine = getBrokenLine();
-        mChartViewImp.addChild(brokenLine);
-        brokenLine.requestFocuse();
-
-
-        CandleLine candleLine = getCandleLine();
-        mChartViewImp.addChild(candleLine);
-        candleLine.requestFocuse();
 
         CrossLine crossLine = mChartViewImp.getCrossLine();
         crossLine.setLineColor(Color.parseColor("#FE7F3F"));
