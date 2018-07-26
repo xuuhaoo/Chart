@@ -449,14 +449,17 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
 
     @Override
     public float[] calculateExtremeYWhenFocused() {
-        float min = mDataList.get(mDrawPointIndex).getLowPrice();
-        float max = mDataList.get(mDrawPointIndex).getHeightPrice();
-        for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
-            CandleLineBean entity = mDataList.get(i);
-            min = entity.getLowPrice() < min && entity.getLowPrice() > 0 ? entity.getLowPrice() : min;
-            max = max > entity.getHeightPrice() ? max : entity.getHeightPrice();
+        if (mDataList != null && mDataList.size() > mDrawPointIndex) {
+            float min = mDataList.get(mDrawPointIndex).getLowPrice();
+            float max = mDataList.get(mDrawPointIndex).getHeightPrice();
+            for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
+                CandleLineBean entity = mDataList.get(i);
+                min = entity.getLowPrice() < min && entity.getLowPrice() > 0 ? entity.getLowPrice() : min;
+                max = max > entity.getHeightPrice() ? max : entity.getHeightPrice();
+            }
+            return new float[]{min, max};
         }
-        return new float[]{min, max};
+        return new float[]{0, 0};
     }
 
     @Override

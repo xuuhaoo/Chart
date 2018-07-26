@@ -506,12 +506,15 @@ public class BrokenLine extends ViewContainer<String> {
 
     @Override
     public float[] calculateExtremeYWhenFocused() {
-        List<String> dataList = new ArrayList<>();
-        for (int i = mDrawPointIndex; i < mDrawPointIndex + mShownPointNums; i++) {
-            dataList.add(mDataList.get(i));
+        if (mDataList != null && mDataList.size() > mDrawPointIndex) {
+            List<String> dataList = new ArrayList<>();
+            for (int i = mDrawPointIndex; i < mDrawPointIndex + mShownPointNums; i++) {
+                dataList.add(mDataList.get(i));
+            }
+            return DataUtils.getExtremeNumber(dataList);
         }
-        float[] result = DataUtils.getExtremeNumber(dataList);
-        return result;
+
+        return new float[]{0, 0};
     }
 
     @Override

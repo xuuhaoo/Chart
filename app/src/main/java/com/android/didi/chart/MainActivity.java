@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
             }
         });
+
         mAddKBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
         //主视图的十字线
         CrossLine crossLine = mChartViewImp.getCrossLine();
-        crossLine.setLineColor(Color.parseColor("#FE7F3F"));
+        crossLine.setLineColor(0xffFE7F3F);
         crossLine.setShowLatitude(true);
         crossLine.setOnCrossLineMoveListener(this);
         crossLine.setShowPoint(false);
@@ -108,8 +109,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
         mChartSubViewImp.followTouch(mChartViewImp);
         mChartViewImp.setCoordinateLineEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 1));
-        mChartViewImp.setCoordinateLineColor(Color.parseColor("#989898"));
-        mChartViewImp.setCoordinateTextColor(Color.parseColor("#989898"));
+        mChartViewImp.setCoordinateLineColor(0xff989898);
+        mChartViewImp.setCoordinateTextColor(0xff989898);
         mChartViewImp.setCoordinateLatitudeNum(5);
         mChartViewImp.setCoordinateLongitudeNum(4);
         mChartViewImp.invalidate();
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         brokenLine.setDataList(brokenLieData);
         brokenLine.setDefaultShowPointNums(brokenLieData.size());
         brokenLine.setFill(false);
-        brokenLine.setLineColor(Color.parseColor("#FE7F3F"));
+        brokenLine.setLineColor(0xffFE7F3F);
         return brokenLine;
     }
 
