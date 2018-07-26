@@ -20,8 +20,8 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
-    api 'com.tonystark.android:chart:0.0.8'
+//    api 'com.tonystark.android:chart:0.0.9'
 
-//    implementation project(':tonychart')
+    implementation project(':tonychart')
     implementation 'com.google.code.gson:gson:2.8.0'
 }

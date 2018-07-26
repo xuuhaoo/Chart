@@ -9,9 +9,6 @@ import android.graphics.Rect;
 import android.view.MotionEvent;
 
 
-import com.android.tonystark.tonychart.chartview.utils.DataUtils;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,9 +47,13 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
     //画最大最小值的画笔
     private Paint mTxtPaint;
     //是否显示了最大值
-    private boolean mAlreadyShowMax = false;
+    private boolean isAlreadyShowMax = false;
     //是否显示了最小值
-    private boolean mAlreadyShowMin = false;
+    private boolean isAlreadyShowMin = false;
+    //是否显示最大值
+    private boolean isNeedShowMaxPrice = false;
+    //是否显示最小值
+    private boolean isNeedShowMinPrice = false;
 
     public CandleLine(Context context, float YMin, float YMax) {
         super(context);
@@ -89,8 +90,8 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
         super.draw(canvas);
         try {
             if (isShow) {
-                mAlreadyShowMax = false;
-                mAlreadyShowMin = false;
+                isAlreadyShowMax = false;
+                isAlreadyShowMin = false;
                 checkParamter();
                 for (int i = 0; i < mShownPointNums && i < mDataList.size(); i++) {
                     drawCandle(mDataList.get(i + mDrawPointIndex), i, canvas);
@@ -159,7 +160,7 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
         //画蜡烛的下尖尖
         canvas.drawLine(needleX, y3, needleX, y4, mCandlePaint);
 
-        if (candleLineBean.heightPrice == getMaxDataValue() && !mAlreadyShowMax) {
+        if (isNeedShowMaxPrice && candleLineBean.heightPrice == getMaxDataValue() && !isAlreadyShowMax) {
             //判断这个数据是在屏幕右边还是左边
             boolean right = i > mShownPointNums / 2;
             //获取要画的蜡烛的中心点
@@ -177,9 +178,9 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
                 canvas.drawLine(needleX, y1, needleX + EXTREME_INDICATOR_LINE_WIDTH, y1 + height, mTxtPaint);
                 canvas.drawText(txt, needleX + EXTREME_INDICATOR_LINE_WIDTH, y1 + height * 1.5f, mTxtPaint);
             }
-            mAlreadyShowMax = true;
+            isAlreadyShowMax = true;
         }
-        if (candleLineBean.lowPrice == getMinDataValue() && !mAlreadyShowMin) {
+        if (isNeedShowMinPrice && candleLineBean.lowPrice == getMinDataValue() && !isAlreadyShowMin) {
             //判断这个数据是在屏幕右边还是左边
             boolean right = i > mShownPointNums / 2;
             //获取要画的蜡烛的中心点
@@ -197,7 +198,7 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
                 canvas.drawLine(needleX, y4, needleX + EXTREME_INDICATOR_LINE_WIDTH, y4, mTxtPaint);
                 canvas.drawText(txt, needleX + EXTREME_INDICATOR_LINE_WIDTH, y4 + height / 2, mTxtPaint);
             }
-            mAlreadyShowMin = true;
+            isAlreadyShowMin = true;
         }
     }
 
@@ -445,6 +446,14 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
     @Override
     public float getSingleDataWidth() {
         return mCandleWidth;
+    }
+
+    public void setShowMaxPrice(boolean needShowMaxPrice) {
+        isNeedShowMaxPrice = needShowMaxPrice;
+    }
+
+    public void setShowMinPrice(boolean needShowMinPrice) {
+        isNeedShowMinPrice = needShowMinPrice;
     }
 
     @Override

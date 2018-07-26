@@ -1,6 +1,5 @@
 package com.android.didi.chart;
 
-import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.PointF;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +14,6 @@ import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.Histogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.MACDHistogram;
-import com.android.tonystark.tonychart.chartview.viewbeans.ViewContainer;
 import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -155,6 +153,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         candleLine.setUpColor(0xfff5515f);
         candleLine.setDownColor(0xff00b78f);
         candleLine.setFill(true);
+        candleLine.setShowMaxPrice(false);
+        candleLine.setShowMinPrice(false);
         return candleLine;
     }
 
