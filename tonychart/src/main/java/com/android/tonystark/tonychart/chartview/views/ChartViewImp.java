@@ -33,7 +33,9 @@ import java.util.List;
 public class ChartViewImp extends View implements ChartView {
     private Context mContext = null;
     //手势跟随View
-    private ChartView mFollowView;
+    private ChartViewImp mFollowView;
+    //是否跟随手势了
+    private boolean isFollowed;
     //画布容器
     private ViewContainer<Object> mViewContainer = null;
     //坐标系
@@ -126,12 +128,15 @@ public class ChartViewImp extends View implements ChartView {
     }
 
     public void followTouch(ChartViewImp view) {
+        //让另一个人知道自己
         view.mFollowView = this;
+        isFollowed = true;
     }
 
     @Override
     public void loseFollow(ChartViewImp view) {
         view.mFollowView = null;
+        isFollowed = false;
     }
 
     /**
@@ -457,6 +462,14 @@ public class ChartViewImp extends View implements ChartView {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if(isFollowed){
+            return true;
+        }
+        onTouchEventPrivate(event);
+        return true;
+    }
+
+    private void onTouchEventPrivate(MotionEvent event) {
         if (mFocusedView != null) {
             //更新十字线
             if (mCrossLine != null) {
@@ -537,9 +550,8 @@ public class ChartViewImp extends View implements ChartView {
         invalidate();
 
         if (mFollowView != null) {
-            mFollowView.onTouchEvent(event);
+            mFollowView.onTouchEventPrivate(event);
         }
-        return true;
     }
 
     /**
@@ -635,7 +647,7 @@ public class ChartViewImp extends View implements ChartView {
     }
 
     /**
-     * 设置坐标系数据
+     * 设置坐标系数据w3
      */
     public void setCoordinateDataList(List dataList) {
         if (mCoordinates != null) {
@@ -652,10 +664,6 @@ public class ChartViewImp extends View implements ChartView {
 
     public CrossLine getCrossLine() {
         return mCrossLine;
-    }
-
-    public void followView(ChartView followView) {
-        mFollowView = followView;
     }
 
     private float spacing(MotionEvent event) {
