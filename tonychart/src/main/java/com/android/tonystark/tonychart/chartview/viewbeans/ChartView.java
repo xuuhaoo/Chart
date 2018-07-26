@@ -18,6 +18,8 @@ public interface ChartView {
 
     void requestFocusChild(ViewContainer vc);
 
+    void notifyNeedForceFlushData();
+
     boolean isFocused(ViewContainer vc);
 
     List<ViewContainer<Object>> getChildren();

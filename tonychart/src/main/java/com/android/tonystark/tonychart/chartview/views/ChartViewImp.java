@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -49,6 +50,12 @@ public class ChartViewImp extends View implements ChartView {
     private int coordinateMarginLeft = 0;
     //手指摁下时的xy点
     private PointF mDownPointF = new PointF();
+    //当前聚焦的View,数据都将以这个View为主
+    private ViewContainer mFocusedView;
+    //聚焦是否变化
+    private boolean mFocusHasChanged;
+    //强制刷新聚焦变化
+    private boolean mForceFlushFocusChanged;
     //长摁回调
     private Handler mLongClickHandler = new Handler() {
         @Override
@@ -63,10 +70,6 @@ public class ChartViewImp extends View implements ChartView {
             }
         }
     };
-    //当前聚焦的View,数据都将以这个View为主
-    private ViewContainer mFocusedView;
-    //聚焦是否变化
-    private boolean mFocusHasChanged;
 
     public ChartViewImp(Context context) {
         super(context);
@@ -97,11 +100,12 @@ public class ChartViewImp extends View implements ChartView {
     }
 
     /**
-     * 加入组件
+     * 加入模块组件
      */
     @Override
     final public void addChild(ViewContainer vc) {
         mViewContainer.addChildren(vc);
+
         vc.setChartView(this);
         vc.setCoordinate(mCoordinates);
         setDrawRect(vc, this.getMeasuredWidth(), this.getMeasuredHeight());
@@ -111,16 +115,17 @@ public class ChartViewImp extends View implements ChartView {
         vc.setYMin(mViewContainer.getYMin());
         vc.setMaxDataValue(mViewContainer.getMaxDataValue());
         vc.setMinDataValue(mViewContainer.getMinDataValue());
+        //保证聚焦组件不为空
+        if (mFocusedView == null) {
+            vc.requestFocuse();
+        }
+        mForceFlushFocusChanged = true;
+        invalidate();
     }
 
     /**
-     * 删除组件
+     * 将模块请求聚焦
      */
-    @Override
-    final public void removeChild(ViewContainer vc) {
-        mViewContainer.removeChildren(vc);
-    }
-
     @Override
     public void requestFocusChild(ViewContainer vc) {
         for (ViewContainer temp : getChildren()) {
@@ -134,6 +139,19 @@ public class ChartViewImp extends View implements ChartView {
         }
     }
 
+    /**
+     * 通知焦点模块数据改变,其他的模块需要刷新数据
+     */
+    @Override
+    public void notifyNeedForceFlushData() {
+        mForceFlushFocusChanged = true;
+    }
+
+    /**
+     * 判断该组件是否是当前聚焦的组件
+     *
+     * @return true 是聚焦的组件
+     */
     @Override
     public boolean isFocused(ViewContainer vc) {
         if (mFocusedView != null) {
@@ -143,13 +161,37 @@ public class ChartViewImp extends View implements ChartView {
         }
     }
 
+    /**
+     * 是否焦点改变了
+     *
+     * @return
+     */
     public boolean isFocusHasChanged() {
         return mFocusHasChanged;
     }
 
+    /**
+     * 获得所有的绘制模块
+     *
+     * @return
+     */
     @Override
     public List<ViewContainer<Object>> getChildren() {
         return mViewContainer.getChildrenList();
+    }
+
+    /**
+     * 删除组件
+     */
+    @Override
+    final public void removeChild(ViewContainer vc) {
+        if (!(vc instanceof Coordinates) && !(vc instanceof CrossLine)) {
+            if (vc.equals(mFocusedView)) {
+                removeFocused();
+            }
+            mViewContainer.removeChildren(vc);
+            invalidate();
+        }
     }
 
     /**
@@ -159,11 +201,22 @@ public class ChartViewImp extends View implements ChartView {
     final public void removeAllChildren() {
         Iterator<ViewContainer<Object>> it = mViewContainer.getChildrenList().iterator();
         while (it.hasNext()) {
-            ViewContainer coordinate = it.next();
-            if (!(coordinate instanceof Coordinates)) {
+            ViewContainer view = it.next();
+            if (!(view instanceof Coordinates) && !(view instanceof CrossLine)) {
                 it.remove();
             }
         }
+        removeFocused();
+        invalidate();
+    }
+
+    private void removeFocused() {
+        mFocusedView = null;
+        setYMax(0);
+        setYMin(0);
+        mCrossLine.setDataList(new ArrayList<String>());
+        mCoordinates.setDataList(new ArrayList<Object>());
+        invalidate();
     }
 
     /**
@@ -326,9 +379,12 @@ public class ChartViewImp extends View implements ChartView {
     final protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (isFocusHasChanged()) {
+        if (isFocusHasChanged() || mForceFlushFocusChanged) {
+            Log.i("OnDraw", "flush the focus data");
             mFocusHasChanged = false;
-            changedFocusData();
+            changedFocusDataPreDraw();
+            //在最后保证changedFocusDataPreDraw函数执行完后还原forceflush状态.
+            mForceFlushFocusChanged = false;
         }
         if (isSnapshotOpen && mSnapshotBitmap != null && !isFocusHasChanged()) {   //绘制快照
             canvas.drawBitmap(mSnapshotBitmap, 0, 0, null);
@@ -343,37 +399,121 @@ public class ChartViewImp extends View implements ChartView {
         }
     }
 
-    private void changedFocusData() {
+    private void changedFocusDataPreDraw() {
         if (mFocusedView == null) {
             return;
         }
         //设置十字线
         if (mCrossLine != null) {
+            //设置十字线数据显示个数,跟随焦点组件
             mCrossLine.setShownPointNums(mFocusedView.getShownPointNums());
-            mCrossLine.setDrawPointIndex(mFocusedView.getDrawPointIndex());
+            //设置十字线单点偏移量,跟随焦点组件
             mCrossLine.setSinglePointOffset(mFocusedView.getSingleDataWidth() / 2);
+            //设置十字线需要展示的数据集,跟随焦点组件
             mCrossLine.setDataList(mFocusedView.getCrossDataList());
         }
 
+        //设置坐标系参数
         if (mCoordinates != null) {
+            //设置坐标系数据显示点数,跟随焦点组件
             mCoordinates.setShownPointNums(mFocusedView.getShownPointNums());
-            mCoordinates.setDrawPointIndex(mFocusedView.getDrawPointIndex());
-            //TODO 设置数据,考虑适配器问题
+            //实时更新坐标系数据
+            mCoordinates.setDataList(mFocusedView.getDataList());
         }
 
-        //设置其他的组件
+        //设置其他的组件默认显示组件点数,跟随焦点组件
         mViewContainer.setDefaultShowPointNums(mFocusedView.getDefaultShowPointNums());
+        //设置其他的组件数据开始绘制下标,跟随焦点组件
         mViewContainer.setDrawPointIndex(mFocusedView.getDrawPointIndex());
+        //设置最少能显示的数据个数,跟随焦点组件
+        mViewContainer.setMinShownPointNums(mFocusedView.getMinShownPointNums());
+        //设置其他组件不计算坐标系最大最小值
         mViewContainer.setCalculateDataExtremum(false);
-        //一定要在ViewContainer设置之后设置
+        //一定要在ViewContainer设置之后设置,设置焦点View计算最大最小值
         mFocusedView.setCalculateDataExtremum(true);
 
-        //设置横纵坐坐标
+        //设置横纵坐坐标极值
         float[] minmax = mFocusedView.calculateExtremeYWhenFocused();
+        //设置Y轴最小值
         setYMin(minmax[0]);
+        //设置Y轴最大值
         setYMax(minmax[1]);
+        //设置数据最大值
         setDataMin(minmax[0]);
+        //设置数据最小值
         setDataMax(minmax[1]);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (mFocusedView != null) {
+            //确定所有组件不计算大小
+            mViewContainer.setCalculateDataExtremum(false);
+            //一定要在ViewContainer设置之后设置,确保focus是计算大小的
+            mFocusedView.setCalculateDataExtremum(true);
+
+            //设置聚焦组件的最大最小
+            setYMax(mFocusedView.getYMax());
+            setYMin(mFocusedView.getYMin());
+        }
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                //当按下时,延迟200毫秒.避免滑动时,会显示十字线
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                MotionEvent motionEvent = MotionEvent.obtain(event.getDownTime(),
+                        event.getEventTime(),
+                        MotionEvent.ACTION_DOWN,
+                        event.getX(),
+                        event.getY(),
+                        event.getMetaState());
+                bundle.putParcelable("down_event", motionEvent);
+                message.setData(bundle);
+                mLongClickHandler.sendMessageDelayed(message, 200);
+                mDownPointF.x = event.getX();
+                mDownPointF.y = event.getY();
+                break;
+            }
+            case MotionEvent.ACTION_POINTER_DOWN: {
+                //当2指按下触摸时,模拟up事件发送,让十字线不显示
+                if (mCrossLine.isShow() && event.getPointerCount() >= 2) {
+                    MotionEvent motionEvent = MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP, 0, 0, 0);
+                    mLongClickHandler.removeCallbacksAndMessages(null);
+                    mCrossLine.move(motionEvent);
+
+                }
+                break;
+            }
+            case MotionEvent.ACTION_MOVE: {
+                //如果长按200毫秒还没达到时,如果滑动就设置isShowCrossLine为false
+                if (!mCrossLine.isShow()) {
+                    if (spacing(event) > 5) {
+                        mLongClickHandler.removeCallbacksAndMessages(null);
+                        mCrossLine.setShow(false);
+                    }
+                } else if (mCrossLine.isShow()) {
+                    //让其移动
+                    mCrossLine.move(event);
+                }
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                if (mCrossLine.isShow()) {
+                    mLongClickHandler.removeCallbacksAndMessages(null);
+                    mCrossLine.move(event);
+                }
+                break;
+            }
+        }
+
+        if (!getCrossLine().isShow()) {//十字线不显示的时候,处理左右移动
+            mViewContainer.zoom(event);
+            mViewContainer.move(event);
+        }
+
+        invalidate();
+        return true;
     }
 
     public boolean isSnapshotOpen() {
@@ -477,90 +617,6 @@ public class ChartViewImp extends View implements ChartView {
 
     public CrossLine getCrossLine() {
         return mCrossLine;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (mFocusedView != null) {
-            if (mCrossLine != null) {
-                mCrossLine.setShownPointNums(mFocusedView.getShownPointNums());
-                mCrossLine.setDrawPointIndex(mFocusedView.getDrawPointIndex());
-                mCrossLine.setSinglePointOffset(mFocusedView.getSingleDataWidth() / 2);
-                mCrossLine.setDataList(mFocusedView.getCrossDataList());
-            }
-
-            if (mCoordinates != null) {
-                mCoordinates.setShownPointNums(mFocusedView.getShownPointNums());
-                mCoordinates.setDrawPointIndex(mFocusedView.getDrawPointIndex());
-                //TODO 设置数据,考虑适配器问题
-            }
-
-            mViewContainer.setCalculateDataExtremum(false);
-            //一定要在ViewContainer设置之后设置
-            mFocusedView.setCalculateDataExtremum(true);
-
-            //设置聚焦组件的最大最小
-            setYMax(mFocusedView.getYMax());
-            setYMin(mFocusedView.getYMin());
-        }
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
-                //当按下时,延迟200毫秒.避免滑动时,会显示十字线
-                Message message = new Message();
-                Bundle bundle = new Bundle();
-                MotionEvent motionEvent = MotionEvent.obtain(event.getDownTime(),
-                        event.getEventTime(),
-                        MotionEvent.ACTION_DOWN,
-                        event.getX(),
-                        event.getY(),
-                        event.getMetaState());
-                bundle.putParcelable("down_event", motionEvent);
-                message.setData(bundle);
-                mLongClickHandler.sendMessageDelayed(message, 200);
-                mDownPointF.x = event.getX();
-                mDownPointF.y = event.getY();
-                break;
-            }
-            case MotionEvent.ACTION_POINTER_DOWN: {
-                //当2指按下触摸时,模拟up事件发送,让十字线不显示
-                if (mCrossLine.isShow() && event.getPointerCount() >= 2) {
-                    MotionEvent motionEvent = MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP, 0, 0, 0);
-                    mLongClickHandler.removeCallbacksAndMessages(null);
-                    mCrossLine.move(motionEvent);
-
-                }
-                break;
-            }
-            case MotionEvent.ACTION_MOVE: {
-                //如果长按200毫秒还没达到时,如果滑动就设置isShowCrossLine为false
-                if (!mCrossLine.isShow()) {
-                    if (spacing(event) > 5) {
-                        mLongClickHandler.removeCallbacksAndMessages(null);
-                        mCrossLine.setShow(false);
-                    }
-                } else if (mCrossLine.isShow()) {
-                    //让其移动
-                    mCrossLine.move(event);
-                }
-                break;
-            }
-            case MotionEvent.ACTION_UP: {
-                if (mCrossLine.isShow()) {
-                    mLongClickHandler.removeCallbacksAndMessages(null);
-                    mCrossLine.move(event);
-                }
-                break;
-            }
-        }
-
-        if (!getCrossLine().isShow()) {//十字线不显示的时候,处理左右移动
-            mViewContainer.zoom(event);
-            mViewContainer.move(event);
-        }
-
-        invalidate();
-        return true;
     }
 
 

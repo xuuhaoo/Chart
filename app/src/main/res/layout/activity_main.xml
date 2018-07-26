@@ -7,6 +7,27 @@
     android:orientation="vertical"
     tools:context="com.android.didi.chart.MainActivity">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/add_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="添加" />
+
+        <Button
+            android:id="@+id/delete_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="删除" />
+
+    </LinearLayout>
+
     <com.android.tonystark.tonychart.chartview.views.ChartViewImp
         android:id="@+id/chart_view"
         android:layout_width="match_parent"

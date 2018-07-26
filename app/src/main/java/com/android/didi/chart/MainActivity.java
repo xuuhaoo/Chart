@@ -4,7 +4,10 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
+import com.android.tonystark.tonychart.chartview.adapter.BreakLineCoordinateAdapter;
 import com.android.tonystark.tonychart.chartview.adapter.CandleCoordinateAdapter;
 import com.android.tonystark.tonychart.chartview.viewbeans.BrokenLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
@@ -27,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     private JsonArray mJsonArray;
     private ChartViewImp mChartViewImp;
+    private Button mAddBtn;
+    private Button mDeleteBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,17 +39,33 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mChartViewImp = findViewById(R.id.chart_view);
-
+        mAddBtn = findViewById(R.id.add_btn);
+        mDeleteBtn = findViewById(R.id.delete_btn);
         inflateMockData();
         drawBroken();
     }
 
     private void drawBroken() {
 
-//        BrokenLine brokenLine = getBrokenLine();
-//        brokenLine.requestFocuse();
-//        mChartViewImp.addChild(brokenLine);
+        mAddBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BrokenLine brokenLine = getBrokenLine();
+                mChartViewImp.addChild(brokenLine);
+                mChartViewImp.setCoordinateScaleAdapter(new BreakLineCoordinateAdapter());
+            }
+        });
 
+        mDeleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mChartViewImp.removeAllChildren();
+            }
+        });
+
+        BrokenLine brokenLine = getBrokenLine();
+        brokenLine.requestFocuse();
+        mChartViewImp.addChild(brokenLine);
 
 
         CandleLine candleLine = new CandleLine(this);
@@ -76,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         List<String> brokenLieData = getBrokenLineData();
         BrokenLine brokenLine = new BrokenLine(this);
         brokenLine.setDataList(brokenLieData);
-        brokenLine.setDefaultShowPointNums(brokenLieData.size() / 2);
+        brokenLine.setDefaultShowPointNums(brokenLieData.size());
         brokenLine.setFill(false);
         brokenLine.setLineColor(Color.parseColor("#FE7F3F"));
         return brokenLine;

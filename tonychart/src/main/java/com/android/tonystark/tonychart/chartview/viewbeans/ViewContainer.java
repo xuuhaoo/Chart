@@ -309,6 +309,9 @@ public class ViewContainer<T extends Object> {
         for (ViewContainer container : getChildrenList()) {
             container.setDrawPointIndex(this.mDrawPointIndex);
         }
+        if (mChartView != null) {
+            this.mChartView.notifyNeedForceFlushData();
+        }
     }
 
     /**
@@ -349,6 +352,9 @@ public class ViewContainer<T extends Object> {
         for (ViewContainer container : getChildrenList()) {
             container.setMinShownPointNums(this.mMinShownPointNums);
         }
+        if (mChartView != null) {
+            this.mChartView.notifyNeedForceFlushData();
+        }
     }
 
     /**
@@ -371,6 +377,9 @@ public class ViewContainer<T extends Object> {
         this.mShownPointNums = this.mDefaultShowPointNums;
         for (ViewContainer container : getChildrenList()) {
             container.setDefaultShowPointNums(defaultShowPointNums);
+        }
+        if (mChartView != null) {
+            this.mChartView.notifyNeedForceFlushData();
         }
     }
 
@@ -449,6 +458,9 @@ public class ViewContainer<T extends Object> {
     public void setDataList(List<T> dataList) {
         mDataList = dataList;
         mCrossDataList = transDataToCrossDataFromDataList(mDataList);
+        if (mChartView != null) {
+            this.mChartView.notifyNeedForceFlushData();
+        }
     }
 
     /**
