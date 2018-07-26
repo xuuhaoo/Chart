@@ -301,7 +301,7 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
             }
         }
         //越界判断
-        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums - 1 : mDrawPointIndex;
+        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums : mDrawPointIndex;
         mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
 
     }
@@ -418,7 +418,7 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
             }
         }
         //越界判断
-        mDrawPointIndex = mDrawPointIndex >= mDataList.size() - mShownPointNums ? mDataList.size() - mShownPointNums - 1 : mDrawPointIndex;
+        mDrawPointIndex = mDrawPointIndex >= mDataList.size() - mShownPointNums ? mDataList.size() - mShownPointNums : mDrawPointIndex;
         mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
     }
 

@@ -345,7 +345,7 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
             }
         }
         //越界判断
-        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums - 1 : mDrawPointIndex;
+        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums : mDrawPointIndex;
         mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
 
     }

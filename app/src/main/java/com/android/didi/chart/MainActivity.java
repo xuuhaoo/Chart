@@ -188,8 +188,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         macdHistogram.setDataList(list);
         //设置该组件默认显示的数据量
         macdHistogram.setDefaultShowPointNums(50);
-        //设置该组件默认起始绘制的下标数,减一是因为下标从0开始
-        macdHistogram.setDrawPointIndex(list.size() - macdHistogram.getDefaultShowPointNums() - 1);
+        //设置该组件默认起始绘制的下标数
+        macdHistogram.setDrawPointIndex(list.size() - macdHistogram.getDefaultShowPointNums());
         //设置涨的颜色
         macdHistogram.setUpColor(0xfff5515f);
         //设置跌的颜色
@@ -213,8 +213,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         histogram.setDataList(list);
         //设置该组件默认显示的数据量
         histogram.setDefaultShowPointNums(50);
-        //设置该组件默认起始绘制的下标数,减一是因为下标从0开始
-        histogram.setDrawPointIndex(list.size() - histogram.getDefaultShowPointNums() - 1);
+        //设置该组件默认起始绘制的下标数
+        histogram.setDrawPointIndex(list.size() - histogram.getDefaultShowPointNums());
         //设置涨的颜色
         histogram.setUpColor(0xfff5515f);
         //设置跌的颜色
@@ -238,8 +238,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         candleLine.setDataList(list);
         //设置该组件默认显示的数据量
         candleLine.setDefaultShowPointNums(50);
-        //设置该组件默认起始绘制的下标数,减一是因为下标从0开始
-        candleLine.setDrawPointIndex(list.size() - candleLine.getDefaultShowPointNums() - 1);
+        //设置该组件默认起始绘制的下标数
+        candleLine.setDrawPointIndex(list.size() - candleLine.getDefaultShowPointNums());
         //设置涨的颜色
         candleLine.setUpColor(0xfff5515f);
         //设置跌的颜色
@@ -267,8 +267,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         brokenLine.setDataList(list);
         //设置该折线组件默认显示的数据量
         brokenLine.setDefaultShowPointNums(50);
-        //设置该折线组件默认起始绘制的下标数,减一是因为下标从0开始
-        brokenLine.setDrawPointIndex(list.size() - brokenLine.getDefaultShowPointNums() - 1);
+        //设置该折线组件默认起始绘制的下标数
+        brokenLine.setDrawPointIndex(list.size() - brokenLine.getDefaultShowPointNums());
         //是否为折线组件填充背景色
         brokenLine.setFill(false);
         //设置折线的线的颜色
@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         Iterator<JsonElement> it = mJsonArray.iterator();
         int index = 0;
         while (it.hasNext()) {
-            if (index > MAX_DATA) {
+            if (index >= MAX_DATA) {
                 break;
             }
             JsonElement element = it.next();
@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         Iterator<JsonElement> it = mJsonArray.iterator();
         int index = 0;
         while (it.hasNext()) {
-            if (index > MAX_DATA) {
+            if (index >= MAX_DATA) {
                 break;
             }
             JsonElement element = it.next();
@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         Iterator<JsonElement> it = mJsonArray.iterator();
         int index = 0;
         while (it.hasNext()) {
-            if (index > MAX_DATA) {
+            if (index >= MAX_DATA) {
                 break;
             }
             JsonElement element = it.next();
@@ -377,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         Iterator<JsonElement> it = mJsonArray.iterator();
         int index = 0;
         while (it.hasNext()) {
-            if (index > MAX_DATA) {
+            if (index >= MAX_DATA) {
                 break;
             }
             JsonElement element = it.next();

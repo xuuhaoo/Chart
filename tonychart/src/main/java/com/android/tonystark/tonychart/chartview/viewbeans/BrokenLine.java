@@ -206,7 +206,7 @@ public class BrokenLine extends ViewContainer<String> {
         if (mDataList.size() - 1 >= dataIndex) {
             String str = mDataList.get(dataIndex);
             float x = i * mPointWidth + mPointWidth / 2 + mCoordinateMarginLeft;
-            float y = (1f - (Float.parseFloat(str) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+            float y = (1f - (DataUtils.parseString2Float(str) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
             pointF.set(x, y);
         }
         return pointF;
@@ -254,7 +254,7 @@ public class BrokenLine extends ViewContainer<String> {
             }
         }
         //越界判断
-        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums - 1 : mDrawPointIndex;
+        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums : mDrawPointIndex;
         mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
     }
 
@@ -309,7 +309,7 @@ public class BrokenLine extends ViewContainer<String> {
                 float min = DataUtils.parseString2Float(mDataList.get(mDrawPointIndex));
                 float max = DataUtils.parseString2Float(mDataList.get(mDrawPointIndex));
                 for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
-                    float value = Float.parseFloat(mDataList.get(i));
+                    float value = DataUtils.parseString2Float(mDataList.get(i));
                     min = value < min && value > 0 ? value : min;
                     max = max > value ? max : value;
                 }
@@ -401,7 +401,7 @@ public class BrokenLine extends ViewContainer<String> {
             }
         }
         //越界判断
-        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums - 1 : mDrawPointIndex;
+        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums : mDrawPointIndex;
         mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
 
     }

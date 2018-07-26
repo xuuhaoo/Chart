@@ -334,7 +334,7 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
             }
         }
         //越界判断
-        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums - 1 : mDrawPointIndex;
+        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums : mDrawPointIndex;
         mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
 
     }
