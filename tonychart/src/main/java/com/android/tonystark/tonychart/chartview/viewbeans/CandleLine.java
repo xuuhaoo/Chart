@@ -311,9 +311,9 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
      */
     public void calculateData() {
         if (isCalculateDataExtremum) {
-            if (mZoomAndMoveCalculateInterface != null) {
-                mYMax = mZoomAndMoveCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-                mYMin = mZoomAndMoveCalculateInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
+            if (mExtremeCalculateInterface != null) {
+                mYMax = mExtremeCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
+                mYMin = mExtremeCalculateInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
             } else if (mDataList.size() > mDrawPointIndex) {
                 float min = mDataList.get(mDrawPointIndex).getLowPrice();
                 float max = mDataList.get(mDrawPointIndex).getHeightPrice();
@@ -458,9 +458,9 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
 
     @Override
     public float[] calculateExtremeYWhenFocused() {
-        if (mZoomAndMoveCalculateInterface != null) {
-            float yMax = mZoomAndMoveCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-            float yMin = mZoomAndMoveCalculateInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
+        if (mExtremeCalculateInterface != null) {
+            float yMax = mExtremeCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
+            float yMin = mExtremeCalculateInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
             return new float[]{yMin, yMax};
         } else if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             float min = mDataList.get(mDrawPointIndex).getLowPrice();

@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置K线组件是否显示屏幕中的最低价
         candleLine.setShowMinPrice(false);
 
-        candleLine.setZoomAndMoveCalculateInterface(new ViewContainer.ZoomAndMoveCalculateInterface() {
+        candleLine.setExtremeCalculateInterface(new ViewContainer.ExtremeCalculateInterface() {
             @Override
             public float onCalculateMax(int drawPointIndex, int showPointNums) {
                 return 0;
