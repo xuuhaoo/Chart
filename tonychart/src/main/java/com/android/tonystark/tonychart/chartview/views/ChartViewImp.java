@@ -447,6 +447,18 @@ public class ChartViewImp extends View implements ChartView {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (mFocusedView != null) {
+            //更新十字线
+            //设置十字线
+            if (mCrossLine != null) {
+                //设置十字线数据显示个数,跟随焦点组件
+                mCrossLine.setShownPointNums(mFocusedView.getShownPointNums());
+                //设置十字线单点偏移量,跟随焦点组件
+                mCrossLine.setSinglePointOffset(mFocusedView.getSingleDataWidth() / 2);
+                //设置十字线组件数据开始绘制下标,跟随焦点组件
+                mCrossLine.setDrawPointIndex(mFocusedView.getDrawPointIndex());
+                //设置十字线需要展示的数据集,跟随焦点组件
+                mCrossLine.setDataList(mFocusedView.getCrossDataList());
+            }
             //确定所有组件不计算大小
             mViewContainer.setCalculateDataExtremum(false);
             //一定要在ViewContainer设置之后设置,确保focus是计算大小的

@@ -64,26 +64,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         BrokenLine brokenLine = getBrokenLine();
-        brokenLine.requestFocuse();
         mChartViewImp.addChild(brokenLine);
+        brokenLine.requestFocuse();
 
 
-        CandleLine candleLine = new CandleLine(this);
-        List<CandleLine.CandleLineBean> list = getCandleLineData();
-        candleLine.setDataList(list);
-        candleLine.setDefaultShowPointNums(list.size());
-        candleLine.setUpColor(0xfff5515f);
-        candleLine.setDownColor(0xff00b78f);
-        candleLine.setFill(true);
-        candleLine.requestFocuse();
+        CandleLine candleLine = getCandleLine();
         mChartViewImp.addChild(candleLine);
+        candleLine.requestFocuse();
 
         CrossLine crossLine = mChartViewImp.getCrossLine();
         crossLine.setLineColor(Color.parseColor("#FE7F3F"));
         crossLine.setShowLatitude(true);
         crossLine.setShowPoint(false);
 
-        mChartViewImp.setCoordinateDataList(list);
         mChartViewImp.setCoordinateLineEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 1));
         mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter());
         mChartViewImp.setCoordinateLineColor(Color.parseColor("#989898"));
@@ -91,6 +84,17 @@ public class MainActivity extends AppCompatActivity {
         mChartViewImp.setCoordinateLatitudeNum(5);
         mChartViewImp.setCoordinateLongitudeNum(4);
         mChartViewImp.invalidate();
+    }
+
+    private CandleLine getCandleLine() {
+        CandleLine candleLine = new CandleLine(this);
+        List<CandleLine.CandleLineBean> list = getCandleLineData();
+        candleLine.setDataList(list);
+        candleLine.setDefaultShowPointNums(list.size());
+        candleLine.setUpColor(0xfff5515f);
+        candleLine.setDownColor(0xff00b78f);
+        candleLine.setFill(true);
+        return candleLine;
     }
 
     private BrokenLine getBrokenLine() {
