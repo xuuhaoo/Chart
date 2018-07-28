@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.android.tonystark.tonychart.chartview.adapter.BreakLineCoordinateAdapter;
+import com.android.tonystark.tonychart.chartview.adapter.BrokenLineCoordinateAdapter;
 import com.android.tonystark.tonychart.chartview.adapter.CandleCoordinateAdapter;
 import com.android.tonystark.tonychart.chartview.viewbeans.BrokenLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 //显示调用如下:brokenLine.requestFocus();
                 mChartViewImp.addChild(brokenLine);
                 //设置主图的坐标系刻度适配器(因为当前聚焦的是折线图,所以坐标系需要展示折线的刻度适配器)
-                mChartViewImp.setCoordinateScaleAdapter(new BreakLineCoordinateAdapter());
+                mChartViewImp.setCoordinateScaleAdapter(new BrokenLineCoordinateAdapter(brokenLine));
 
                 //得到创建好的组件
                 MACDHistogram macdHistogram = getMACD();
@@ -95,26 +95,24 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 mChartSubViewImp.removeAllChildren();
 
 
-//                //得到刚才创建好的组件
-//                BrokenLine brokenLine = getBrokenLine();
-//                //添加组件到主图中
-//                mChartViewImp.addChild(brokenLine);
-//
-//                //得到创建好的组件
-//                CandleLine candleLine = getCandleLine();
-//                //添加组件到主图中
-//                mChartViewImp.addChild(candleLine);
-//                //因为当前主视图中有折线组建了,
-//                //但我们希望,主图中坐标系和其他值都以K线为准,所以我们
-//                //设置K线图为当前聚焦组件,设置聚焦组件后,坐标系的最大最小值都会以当前聚焦的K线组件的最大最小值为准,在此坐标系中的其他组件也会以他为准
-//                //如果多个组件在一个视图中同时都调用了requestFocuse,将以最后一个调用者为当前focused的组件
-//                candleLine.requestFocuse();
-//                candleLine.setExtremeCalculatorInterface(new MyExtremeCalculator(mChartViewImp));
-//
-//                //设置主图的坐标系刻度适配器(因为当前聚焦的是K线图,所以坐标系需要展示K线的刻度适配器)
-//                mChartViewImp.setCoordinateScaleAdapter(new
-//
-//                        CandleCoordinateAdapter());
+                //得到刚才创建好的组件
+                BrokenLine brokenLine = getBrokenLine();
+                //添加组件到主图中
+                mChartViewImp.addChild(brokenLine);
+
+                //得到创建好的组件
+                CandleLine candleLine = getCandleLine();
+                //添加组件到主图中
+                mChartViewImp.addChild(candleLine);
+                //因为当前主视图中有折线组建了,
+                //但我们希望,主图中坐标系和其他值都以K线为准,所以我们
+                //设置K线图为当前聚焦组件,设置聚焦组件后,坐标系的最大最小值都会以当前聚焦的K线组件的最大最小值为准,在此坐标系中的其他组件也会以他为准
+                //如果多个组件在一个视图中同时都调用了requestFocuse,将以最后一个调用者为当前focused的组件
+                candleLine.requestFocuse();
+                candleLine.setExtremeCalculatorInterface(new MyExtremeCalculator(mChartViewImp));
+
+                //设置主图的坐标系刻度适配器(因为当前聚焦的是K线图,所以坐标系需要展示K线的刻度适配器)
+                mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter(candleLine));
 
                 //得到创建好的组件
                 Histogram histogram = getHistogram();
@@ -275,9 +273,9 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置K线组件中蜡烛是边框型蜡烛还是实心的蜡烛,也就是说是否填充蜡烛的颜色
         candleLine.setFill(true);
         //设置K线组件是否显示屏幕中的最高价
-        candleLine.setShowMaxPrice(false);
+        candleLine.setShowMaxPrice(true);
         //设置K线组件是否显示屏幕中的最低价
-        candleLine.setShowMinPrice(false);
+        candleLine.setShowMinPrice(true);
 
         return candleLine;
     }

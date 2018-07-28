@@ -9,6 +9,7 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -209,6 +210,17 @@ public class ChartViewImp extends View implements ChartView {
             mViewContainer.removeChildren(vc);
             invalidate();
         }
+    }
+
+    /**
+     * 返回聚焦的View
+     *
+     * @return
+     */
+    @Override
+    @Nullable
+    public ViewContainer getFocusedView() {
+        return mFocusedView;
     }
 
     /**
@@ -450,7 +462,7 @@ public class ChartViewImp extends View implements ChartView {
         mFocusedView.setCalculateDataExtremum(true);
 
         //设置横纵坐坐标极值
-        float[] minmax = mFocusedView.calculateExtremeYWhenFocused();
+        float[] minmax = mFocusedView.calculateExtremeY();
         //设置Y轴最小值
         setYMin(minmax[0]);
         //设置Y轴最大值
@@ -463,6 +475,14 @@ public class ChartViewImp extends View implements ChartView {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (isFollowed) {
+            return true;
+        }
+        onTouchEventPrivate(event);
+        return true;
+    }
+
+    private void onTouchEventPrivate(MotionEvent event) {
         if (mFocusedView != null) {
             //更新十字线
             if (mCrossLine != null) {
@@ -484,15 +504,6 @@ public class ChartViewImp extends View implements ChartView {
             setYMax(mFocusedView.getYMax());
             setYMin(mFocusedView.getYMin());
         }
-
-        if (isFollowed) {
-            return true;
-        }
-        onTouchEventPrivate(event);
-        return true;
-    }
-
-    private void onTouchEventPrivate(MotionEvent event) {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {

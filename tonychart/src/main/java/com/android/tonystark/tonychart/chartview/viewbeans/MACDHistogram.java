@@ -164,7 +164,7 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
                     scale = scale < 1 ? 1 : scale;
                     if (Math.abs(difX) >= MIN_MOVE_DISTANCE) {
                         move(difX, scale);
-                        calculateData();
+                        calculateExtremeYPrivate();
                     }
                     moveDownHistogramF.x = event.getX();
                     moveDownHistogramF.y = event.getY();
@@ -220,7 +220,7 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
                             if (zoomIn(scale)) calculateDrawHistogramIndex(event, scale, 1);//1代表了放大
                         }
                         //计算最大最小值
-                        calculateData();
+                        calculateExtremeYPrivate();
                     }
                 }
                 break;
@@ -238,22 +238,11 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
     /**
      * 计算坐标极值
      */
-    public void calculateData() {
+    private void calculateExtremeYPrivate() {
         if (isCalculateDataExtraNum) {
-            if (mExtremeCalculatorInterface != null) {
-                mYMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-                mYMin = 0;
-            } else if (mDataList.size() > mDrawPointIndex) {
-                float min = mDataList.get(mDrawPointIndex).getMacd();
-                float max = mDataList.get(mDrawPointIndex).getMacd();
-                for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
-                    float value = mDataList.get(i).getMacd();
-                    min = value < min && value > 0 ? value : min;
-                    max = max > value ? max : value;
-                }
-                mYMax = max;
-                mYMin = 0;
-            }
+            float[] value = calculateExtremeY();
+            mYMin = value[0];
+            mYMax = value[1];
         }
     }
 
@@ -451,7 +440,7 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
     }
 
     @Override
-    public float[] calculateExtremeYWhenFocused() {
+    public float[] calculateExtremeY() {
         if (mExtremeCalculatorInterface != null) {
             float yMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
             float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
@@ -463,6 +452,7 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
                 dataList.add(bean.getMacd() + "");
             }
             float[] result = DataUtils.getExtremeNumber(dataList);
+            result[0] = 0;
             return result;
 
         }

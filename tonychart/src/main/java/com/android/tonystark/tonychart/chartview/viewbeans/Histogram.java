@@ -155,7 +155,7 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
                     scale = scale < 1 ? 1 : scale;
                     if (Math.abs(difX) >= MIN_MOVE_DISTANCE) {
                         move(difX, scale);
-                        calculateData();
+                        calculateExtremeYPrivate();
                     }
                     moveDownHistogramF.x = event.getX();
                     moveDownHistogramF.y = event.getY();
@@ -211,7 +211,7 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
                             if (zoomIn(scale)) calculateDrawHistogramIndex(event, scale, 1);//1代表了放大
                         }
                         //计算最大最小值
-                        calculateData();
+                        calculateExtremeYPrivate();
                     }
                 }
                 break;
@@ -228,22 +228,11 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
     /**
      * 计算坐标极值
      */
-    public void calculateData() {
+    private void calculateExtremeYPrivate() {
         if (isCalculateDataExtremum) {
-            if (mExtremeCalculatorInterface != null) {
-                mYMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-                mYMin = 0;
-            } else if (mDataList.size() > mDrawPointIndex) {
-                float min = mDataList.get(mDrawPointIndex).turnover;
-                float max = mDataList.get(mDrawPointIndex).turnover;
-                for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
-                    float value = mDataList.get(i).turnover;
-                    min = value < min && value > 0 ? value : min;
-                    max = max > value ? max : value;
-                }
-                mYMax = max;
-                mYMin = 0;
-            }
+            float[] value = calculateExtremeY();
+            mYMin = value[0];
+            mYMax = value[1];
         }
     }
 
@@ -410,7 +399,7 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
     }
 
     @Override
-    public float[] calculateExtremeYWhenFocused() {
+    public float[] calculateExtremeY() {
         if (mExtremeCalculatorInterface != null) {
             float yMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
             float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);

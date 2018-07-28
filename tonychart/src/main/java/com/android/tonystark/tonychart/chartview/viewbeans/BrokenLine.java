@@ -9,7 +9,6 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Shader;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.android.tonystark.tonychart.chartview.utils.DataUtils;
@@ -226,7 +225,7 @@ public class BrokenLine extends ViewContainer<String> {
                     scale = scale < 1 ? 1 : scale;
                     if (Math.abs(difX) >= MIN_MOVE_DISTANCE) {
                         move(difX, scale);
-                        calculateData();
+                        calculateExtremeYPrivate();
                     }
                     mMoveDownPointF.x = event.getX();
                     mMoveDownPointF.y = event.getY();
@@ -282,7 +281,7 @@ public class BrokenLine extends ViewContainer<String> {
                             if (zoomIn(scale)) calculateDrawPointIndex(event, scale, 1);//1代表了放大
                         }
                         //计算最大最小值
-                        calculateData();
+                        calculateExtremeYPrivate();
                     }
                 }
                 break;
@@ -299,23 +298,11 @@ public class BrokenLine extends ViewContainer<String> {
     /**
      * 计算坐标极值
      */
-    private void calculateData() {
+    private void calculateExtremeYPrivate() {
         if (isCalculateDataExtremum) {
-            Log.i("calculateData", "计算了");
-            if (mExtremeCalculatorInterface != null) {
-                mYMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-                mYMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
-            } else if (mDataList.size() > mDrawPointIndex) {
-                float min = DataUtils.parseString2Float(mDataList.get(mDrawPointIndex));
-                float max = DataUtils.parseString2Float(mDataList.get(mDrawPointIndex));
-                for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
-                    float value = DataUtils.parseString2Float(mDataList.get(i));
-                    min = value < min && value > 0 ? value : min;
-                    max = max > value ? max : value;
-                }
-                mYMax = max;
-                mYMin = min;
-            }
+            float[] value = calculateExtremeY();
+            mYMin = value[0];
+            mYMax = value[1];
         }
     }
 
@@ -507,15 +494,15 @@ public class BrokenLine extends ViewContainer<String> {
     }
 
     @Override
-    public float[] calculateExtremeYWhenFocused() {
+    public float[] calculateExtremeY() {
         if (mExtremeCalculatorInterface != null) {
             float yMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
             float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
             return new float[]{yMin, yMax};
         } else if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             List<String> dataList = new ArrayList<>();
-            for (int i = mDrawPointIndex; i < mDrawPointIndex + mShownPointNums; i++) {
-                if (TextUtils.isEmpty(mDataList.get(i)) || "null".equalsIgnoreCase(mDataList.get(i)) || mDataList.get(i) == null) {
+            for (int i = mDrawPointIndex; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
+                if (TextUtils.isEmpty(mDataList.get(i)) || "null".equalsIgnoreCase(mDataList.get(i))) {
                     continue;
                 }
                 dataList.add(mDataList.get(i));

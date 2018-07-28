@@ -13,29 +13,20 @@ public class CandleCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<
 
     private SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
 
+    private CandleLine mCandleLine;
+
+    public CandleCoordinateAdapter(CandleLine candleLine) {
+        mCandleLine = candleLine;
+    }
+
     @Override
     public String getYLeftScaleString(List<CandleLine.CandleLineBean> dataList, int drawPointIndex, int showPointNums, int scaleIndex, int totalYScaleNum) {
-        String scale = "0.00";
+        String scale = "0";
 
-        if (dataList == null || dataList.isEmpty()) {
-            return scale;
-        }
-        //最大的对象
-        CandleLine.CandleLineBean maxBean = dataList.get(drawPointIndex);
-        //最小的对象
-        CandleLine.CandleLineBean minBean = dataList.get(drawPointIndex);
+        float[] extreme = mCandleLine.calculateExtremeY();
 
-        //查找最大最小对象
-        for (int i = drawPointIndex + 1; i < drawPointIndex + showPointNums && i < dataList.size(); i++) {
-            CandleLine.CandleLineBean bean = dataList.get(i);
-            maxBean = bean.getHeightPrice() > maxBean.getHeightPrice() ? bean : maxBean;
-            minBean = bean.getLowPrice() < minBean.getLowPrice() && bean.getLowPrice() > 0 ? bean : minBean;
-        }
-
-        //最大值
-        float max = maxBean.getHeightPrice();
-        //最小值
-        float min = minBean.getLowPrice();
+        float min = extreme[0];
+        float max = extreme[1];
 
         max = calYMaxWithSpace(max, min, totalYScaleNum);
         min = calYMinWithSpace(max, min, totalYScaleNum);
@@ -45,7 +36,7 @@ public class CandleCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<
             scale = (max - (decrease * i)) + "";
         }
 
-        return DataUtils.format(scale, 2, true);
+        return DataUtils.format(scale, 3, true);
     }
 
     @Override

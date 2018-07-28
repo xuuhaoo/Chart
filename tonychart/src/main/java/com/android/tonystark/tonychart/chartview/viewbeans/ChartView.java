@@ -21,6 +21,8 @@ public interface ChartView {
 
     void removeChild(ViewContainer vc);
 
+    ViewContainer getFocusedView();
+
     void requestFocusChild(ViewContainer vc);
 
     void notifyNeedForceFlushData();

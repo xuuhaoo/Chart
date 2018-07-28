@@ -250,7 +250,7 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
                             if (zoomIn(scale)) calculateDrawCandleIndex(event, scale, 1);//1代表了放大
                         }
                         //计算最大最小值
-                        calculateData();
+                        calculateExtremeYPrivate();
                     }
                 }
                 break;
@@ -309,24 +309,13 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
     /**
      * 计算坐标极值
      */
-    public void calculateData() {
+    private void calculateExtremeYPrivate() {
         if (isCalculateDataExtremum) {
-            if (mExtremeCalculatorInterface != null) {
-                mYMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-                mYMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
-            } else if (mDataList.size() > mDrawPointIndex) {
-                float min = mDataList.get(mDrawPointIndex).getLowPrice();
-                float max = mDataList.get(mDrawPointIndex).getHeightPrice();
-                for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
-                    CandleLineBean entity = mDataList.get(i);
-                    min = entity.getLowPrice() < min && entity.getLowPrice() > 0 ? entity.getLowPrice() : min;
-                    max = max > entity.getHeightPrice() ? max : entity.getHeightPrice();
-                }
-                setMaxDataValue(max);
-                setMinDataValue(min);
-                mYMax = max;
-                mYMin = min;
-            }
+            float[] value = calculateExtremeY();
+            setMinDataValue(value[0]);
+            setMaxDataValue(value[1]);
+            mYMin = value[0];
+            mYMax = value[1];
         }
     }
 
@@ -391,7 +380,7 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
                     scale = scale < 1 ? 1 : scale;
                     if (Math.abs(difX) >= MIN_MOVE_DISTANCE) {
                         move(difX, scale);
-                        calculateData();
+                        calculateExtremeYPrivate();
                     }
                     moveDownPointF.x = event.getX();
                     moveDownPointF.y = event.getY();
@@ -457,7 +446,7 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
     }
 
     @Override
-    public float[] calculateExtremeYWhenFocused() {
+    public float[] calculateExtremeY() {
         if (mExtremeCalculatorInterface != null) {
             float yMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
             float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);

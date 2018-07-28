@@ -435,7 +435,7 @@ public class ViewContainer<T extends Object> {
      * 计算Y的最大最小值,因为当聚焦后
      * 整个坐标系的最大最小值将按照此模块的数据为准
      */
-    public float[] calculateExtremeYWhenFocused() {
+    public float[] calculateExtremeY() {
         float[] result = new float[]{0, 0};
         return result;
     }

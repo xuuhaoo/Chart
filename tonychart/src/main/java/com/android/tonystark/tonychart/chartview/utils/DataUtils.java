@@ -38,12 +38,15 @@ public class DataUtils {
         if (data == null || data.isEmpty()) {
             return new float[]{0, 0};
         }
-        float[] extreme = new float[2];
-        float max = Float.parseFloat(data.get(0));
-        float min = Float.parseFloat(data.get(0));
+        float[] extreme = new float[]{0, 0};
+        float max = parseString2Float(data.get(0));
+        float min = parseString2Float(data.get(0));
 
         for (String str : data) {
-            float value = Float.parseFloat(str);
+            if (TextUtils.isEmpty(str) || "null".equalsIgnoreCase(str)) {
+                continue;
+            }
+            float value = parseString2Float(str);
             if (max < value) {
                 max = value;
             }
