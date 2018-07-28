@@ -70,6 +70,7 @@ public class ChartViewImp extends View implements ChartView {
                 if (bundle != null && mCrossLine != null && !mCrossLine.isShow()) {
                     MotionEvent event = bundle.getParcelable("down_event");
                     mCrossLine.move(event);
+                    invalidate();
                 }
             }
         }
@@ -462,14 +463,6 @@ public class ChartViewImp extends View implements ChartView {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (isFollowed) {
-            return true;
-        }
-        onTouchEventPrivate(event);
-        return true;
-    }
-
-    private void onTouchEventPrivate(MotionEvent event) {
         if (mFocusedView != null) {
             //更新十字线
             if (mCrossLine != null) {
@@ -491,6 +484,15 @@ public class ChartViewImp extends View implements ChartView {
             setYMax(mFocusedView.getYMax());
             setYMin(mFocusedView.getYMin());
         }
+
+        if (isFollowed) {
+            return true;
+        }
+        onTouchEventPrivate(event);
+        return true;
+    }
+
+    private void onTouchEventPrivate(MotionEvent event) {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {

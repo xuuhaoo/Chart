@@ -5,10 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.util.Log;
 import android.view.MotionEvent;
-
-import java.util.List;
 
 /**
  * 描述：十字线
@@ -34,13 +31,15 @@ public class CrossLine extends ViewContainer<String> {
     //点的半径
     private int mRadius = 10;
     //是否显示点
-    private boolean isShowPoint = true;
+    private boolean isShowPoint = false;
     //是否显示纬线
     private boolean isShowLatitude = true;
     //是否显示经线
     private boolean isShowLongitude = true;
-    //是否十字交叉点跟随数据
-    private boolean isFollowData = true;
+    //是否十字线纬线跟随数据
+    private boolean isLatitudeFollowData = true;
+    //是否十字线经线跟随数据
+    private boolean isLongitudeFollowData = true;
     //每个点的宽度
     private float mPointWidth = 0;
     //十字拖动监听器
@@ -123,7 +122,7 @@ public class CrossLine extends ViewContainer<String> {
     //绘制纬线
     private void drawLatitude(Canvas canvas, int index) {
         float y = mPointF.y;
-        if (isFollowData) {
+        if (isLatitudeFollowData) {
             if (!mDataList.isEmpty() && index <= mDataList.size() - 1) {
                 try {
                     y = (1f - (Float.parseFloat(mDataList.get(index + mDrawPointIndex)) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
@@ -144,7 +143,7 @@ public class CrossLine extends ViewContainer<String> {
     //绘制经线
     private void drawLongitude(Canvas canvas, int index) {
         float x = mPointF.x;
-        if (isFollowData) {
+        if (isLongitudeFollowData) {
             if (!mDataList.isEmpty() && index <= mDataList.size() - 1) {
                 x = index * mPointWidth + mCoordinateMarginLeft;
             } else if (!mDataList.isEmpty()) {
@@ -180,8 +179,9 @@ public class CrossLine extends ViewContainer<String> {
             } catch (NumberFormatException e) {
                 y = mPointF.y;
             }
+            x += mSinglePointOffset;
         }
-        x += mSinglePointOffset;
+
         canvas.drawCircle(x, y, mRadius, mPointPaint);
     }
 
@@ -309,9 +309,11 @@ public class CrossLine extends ViewContainer<String> {
         this.mSinglePointOffset = singlePointOffset;
     }
 
-    public void setFollowData(boolean followData) {
-        isFollowData = followData;
+    public void setLatitudeFollowData(boolean latitudeFollowData) {
+        isLatitudeFollowData = latitudeFollowData;
     }
 
-
+    public void setLongitudeFollowData(boolean longitudeFollowData) {
+        isLongitudeFollowData = longitudeFollowData;
+    }
 }

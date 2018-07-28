@@ -14,7 +14,6 @@ import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.Histogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.MACDHistogram;
-import com.android.tonystark.tonychart.chartview.viewbeans.ViewContainer;
 import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -89,30 +88,33 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
         mAddKBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 //删除主图所有组件
                 mChartViewImp.removeAllChildren();
                 //删除副图的所有组件
                 mChartSubViewImp.removeAllChildren();
 
 
-                //得到刚才创建好的组件
-                BrokenLine brokenLine = getBrokenLine();
-                //添加组件到主图中
-                mChartViewImp.addChild(brokenLine);
-
-                //得到创建好的组件
-                CandleLine candleLine = getCandleLine();
-                //添加组件到主图中
-                mChartViewImp.addChild(candleLine);
-                //因为当前主视图中有折线组建了,
-                //但我们希望,主图中坐标系和其他值都以K线为准,所以我们
-                //设置K线图为当前聚焦组件,设置聚焦组件后,坐标系的最大最小值都会以当前聚焦的K线组件的最大最小值为准,在此坐标系中的其他组件也会以他为准
-                //如果多个组件在一个视图中同时都调用了requestFocuse,将以最后一个调用者为当前focused的组件
-                candleLine.requestFocuse();
-
-                //设置主图的坐标系刻度适配器(因为当前聚焦的是K线图,所以坐标系需要展示K线的刻度适配器)
-                mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter());
+//                //得到刚才创建好的组件
+//                BrokenLine brokenLine = getBrokenLine();
+//                //添加组件到主图中
+//                mChartViewImp.addChild(brokenLine);
+//
+//                //得到创建好的组件
+//                CandleLine candleLine = getCandleLine();
+//                //添加组件到主图中
+//                mChartViewImp.addChild(candleLine);
+//                //因为当前主视图中有折线组建了,
+//                //但我们希望,主图中坐标系和其他值都以K线为准,所以我们
+//                //设置K线图为当前聚焦组件,设置聚焦组件后,坐标系的最大最小值都会以当前聚焦的K线组件的最大最小值为准,在此坐标系中的其他组件也会以他为准
+//                //如果多个组件在一个视图中同时都调用了requestFocuse,将以最后一个调用者为当前focused的组件
+//                candleLine.requestFocuse();
+//                candleLine.setExtremeCalculatorInterface(new MyExtremeCalculator(mChartViewImp));
+//
+//                //设置主图的坐标系刻度适配器(因为当前聚焦的是K线图,所以坐标系需要展示K线的刻度适配器)
+//                mChartViewImp.setCoordinateScaleAdapter(new
+//
+//                        CandleCoordinateAdapter());
 
                 //得到创建好的组件
                 Histogram histogram = getHistogram();
@@ -131,34 +133,40 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
             }
         });
 
-        //============================以下是主图十字线设置(开始)============================
+        initMainCrossLine();
+        initSubCrossLine();
+
+        initMainView();
+        initSubView();
+
+
+    }
+
+    private void initMainCrossLine() {
         //得到一个主图十字线的引用
         CrossLine crossLine = mChartViewImp.getCrossLine();
         //设置主图十字线颜色
         crossLine.setLineColor(0xffFE7F3F);
         //设置主图十字线滑动监听器,this表示当前类实现了该接口
         crossLine.setOnCrossLineMoveListener(this);
-        //设置交叉圆点不显示
-        crossLine.setShowPoint(false);
-        //设置不自动吸附数据点,让其跟随手指随意滑动
-        crossLine.setFollowData(false);
-        //============================以上是主图十字线设置(结束)============================
+        //设置纬线不跟数据
+        crossLine.setLatitudeFollowData(false);
+    }
 
-        //============================以下是副图十字线设置(开始)============================
-        //设置十字线交叉点是否显示圆点
-        mChartSubViewImp.getCrossLine().setShowPoint(false);
-        //设置十字线纬线(横着的)是否可见
-        mChartSubViewImp.getCrossLine().setShowLatitude(false);
-        //设置十字线经线(竖着的)是否可见
-        mChartSubViewImp.getCrossLine().setShowLongitude(true);
-        //设置十字线是否自动吸附数据
-        mChartSubViewImp.getCrossLine().setFollowData(false);
-        //============================以上是副图十字线设置(结束)============================
+    private void initSubCrossLine() {
+        //得到一个主图十字线的引用
+        CrossLine crossLine = mChartSubViewImp.getCrossLine();
+        //设置主图十字线颜色
+        crossLine.setLineColor(0xffFE7F3F);
+        //设置主图十字线滑动监听器,this表示当前类实现了该接口
+        crossLine.setOnCrossLineMoveListener(this);
+        //设置纬线不跟数据
+        crossLine.setLatitudeFollowData(false);
+        //设置不显示纬线
+        crossLine.setShowLatitude(false);
+    }
 
-        //副图跟随主图滑动
-        mChartSubViewImp.followTouch(mChartViewImp);
-        //设置副图的左边间距
-        mChartSubViewImp.setMarginLeft((int) mChartViewImp.getCoordinateLeftTextWidth(7));
+    private void initMainView() {
         //设置主图的左边距
         mChartViewImp.setMarginLeft((int) mChartViewImp.getCoordinateLeftTextWidth(7));
         //设置坐标系线的样式
@@ -173,6 +181,25 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mChartViewImp.setCoordinateLongitudeNum(4);
         //让图表视图更新
         mChartViewImp.invalidate();
+    }
+
+    private void initSubView() {
+        //副图跟随主图滑动
+        mChartSubViewImp.followTouch(mChartViewImp);
+        //设置副图的左边间距
+        mChartSubViewImp.setMarginLeft((int) mChartSubViewImp.getCoordinateLeftTextWidth(7));
+        //设置坐标系线的样式
+        mChartSubViewImp.setCoordinateLineEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 1));
+        //设置坐标系线的颜色
+        mChartSubViewImp.setCoordinateLineColor(0xff989898);
+        //设置坐标系刻度值文字颜色
+        mChartSubViewImp.setCoordinateTextColor(0xff989898);
+        //设置坐标系纬线(横着的)个数,包含顶边框和底边框
+        mChartSubViewImp.setCoordinateLatitudeNum(5);
+        //设置坐标系经线(竖着的)个数,包含左边框和右边框
+        mChartSubViewImp.setCoordinateLongitudeNum(4);
+        //让图表视图更新
+        mChartSubViewImp.invalidate();
     }
 
     /**
@@ -252,17 +279,6 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置K线组件是否显示屏幕中的最低价
         candleLine.setShowMinPrice(false);
 
-        candleLine.setExtremeCalculateInterface(new ViewContainer.ExtremeCalculateInterface() {
-            @Override
-            public float onCalculateMax(int drawPointIndex, int showPointNums) {
-                return 0;
-            }
-
-            @Override
-            public float onCalculateMin(int drawPointIndex, int showPointNums) {
-                return 0;
-            }
-        });
         return candleLine;
     }
 
@@ -293,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
     @Override
     public void onCrossLineMove(int index, int drawIndex, PointF pointF) {
         mChartSubViewImp.getCrossLine().setPointF(pointF);
+        mChartSubViewImp.invalidate();
     }
 
     @Override

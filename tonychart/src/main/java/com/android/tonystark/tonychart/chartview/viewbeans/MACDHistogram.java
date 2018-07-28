@@ -240,8 +240,8 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
      */
     public void calculateData() {
         if (isCalculateDataExtraNum) {
-            if (mExtremeCalculateInterface != null) {
-                mYMax = mExtremeCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
+            if (mExtremeCalculatorInterface != null) {
+                mYMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
                 mYMin = 0;
             } else if (mDataList.size() > mDrawPointIndex) {
                 float min = mDataList.get(mDrawPointIndex).getMacd();
@@ -452,9 +452,9 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
 
     @Override
     public float[] calculateExtremeYWhenFocused() {
-        if (mExtremeCalculateInterface != null) {
-            float yMax = mExtremeCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-            float yMin = mExtremeCalculateInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
+        if (mExtremeCalculatorInterface != null) {
+            float yMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
+            float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
             return new float[]{yMin, yMax};
         } else if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             List<String> dataList = new ArrayList<>();

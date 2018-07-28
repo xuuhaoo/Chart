@@ -302,9 +302,9 @@ public class BrokenLine extends ViewContainer<String> {
     private void calculateData() {
         if (isCalculateDataExtremum) {
             Log.i("calculateData", "计算了");
-            if (mExtremeCalculateInterface != null) {
-                mYMax = mExtremeCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-                mYMin = mExtremeCalculateInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
+            if (mExtremeCalculatorInterface != null) {
+                mYMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
+                mYMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
             } else if (mDataList.size() > mDrawPointIndex) {
                 float min = DataUtils.parseString2Float(mDataList.get(mDrawPointIndex));
                 float max = DataUtils.parseString2Float(mDataList.get(mDrawPointIndex));
@@ -508,9 +508,9 @@ public class BrokenLine extends ViewContainer<String> {
 
     @Override
     public float[] calculateExtremeYWhenFocused() {
-        if (mExtremeCalculateInterface != null) {
-            float yMax = mExtremeCalculateInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-            float yMin = mExtremeCalculateInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
+        if (mExtremeCalculatorInterface != null) {
+            float yMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
+            float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
             return new float[]{yMin, yMax};
         } else if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             List<String> dataList = new ArrayList<>();

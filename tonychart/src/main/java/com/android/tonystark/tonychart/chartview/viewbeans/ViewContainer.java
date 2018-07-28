@@ -46,7 +46,7 @@ public class ViewContainer<T extends Object> {
     //数据的最小值，区别于坐标最小值yMin
     private float mMinDataValue;
     //放大缩小监听器
-    protected ExtremeCalculateInterface mExtremeCalculateInterface = null;
+    protected ExtremeCalculatorInterface mExtremeCalculatorInterface = null;
     //从第几个点开始画
     protected int mDrawPointIndex = 0;
     //显示的点数
@@ -215,8 +215,8 @@ public class ViewContainer<T extends Object> {
      *
      * @param zoomAndmoveCalculateInterface
      */
-    public final void setExtremeCalculateInterface(ExtremeCalculateInterface zoomAndmoveCalculateInterface) {
-        mExtremeCalculateInterface = zoomAndmoveCalculateInterface;
+    public final void setExtremeCalculatorInterface(ExtremeCalculatorInterface zoomAndmoveCalculateInterface) {
+        mExtremeCalculatorInterface = zoomAndmoveCalculateInterface;
     }
 
     /**
@@ -504,7 +504,7 @@ public class ViewContainer<T extends Object> {
         }
     }
 
-    public interface ExtremeCalculateInterface {
+    public interface ExtremeCalculatorInterface {
         float onCalculateMax(int drawPointIndex, int showPointNums);
 
         float onCalculateMin(int drawPointIndex, int showPointNums);
