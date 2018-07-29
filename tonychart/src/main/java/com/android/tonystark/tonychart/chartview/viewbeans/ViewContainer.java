@@ -2,6 +2,8 @@ package com.android.tonystark.tonychart.chartview.viewbeans;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.support.annotation.CallSuper;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -95,6 +97,7 @@ public class ViewContainer<T extends Object> {
 
     public void setCoordinateHeight(float coordinateHeight) {
         this.mCoordinateHeight = coordinateHeight;
+
         for (ViewContainer<Object> viewContainer : getChildrenList()) {
             viewContainer.setCoordinateHeight(coordinateHeight);
         }

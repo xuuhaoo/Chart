@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
     private void initMainView() {
         //设置主图的左边距
-        mChartViewImp.setMarginLeft((int) mChartViewImp.getCoordinateLeftTextWidth(7));
+        mChartViewImp.setMarginLeft((int) mChartViewImp.getCoordinateLeftTextWidth(8));
         //设置坐标系线的样式
         mChartViewImp.setCoordinateLineEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 1));
         //设置坐标系线的颜色
@@ -177,6 +177,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mChartViewImp.setCoordinateLatitudeNum(5);
         //设置坐标系经线(竖着的)个数,包含左边框和右边框
         mChartViewImp.setCoordinateLongitudeNum(4);
+        //设置坐标系背景
+        mChartViewImp.setCoordinateBackground(0xfffb8383);
         //让图表视图更新
         mChartViewImp.invalidate();
     }
@@ -185,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //副图跟随主图滑动
         mChartSubViewImp.followTouch(mChartViewImp);
         //设置副图的左边间距
-        mChartSubViewImp.setMarginLeft((int) mChartSubViewImp.getCoordinateLeftTextWidth(7));
+        mChartSubViewImp.setMarginLeft((int) mChartSubViewImp.getCoordinateLeftTextWidth(8));
         //设置坐标系线的样式
         mChartSubViewImp.setCoordinateLineEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 1));
         //设置坐标系线的颜色

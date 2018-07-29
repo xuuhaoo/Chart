@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PathEffect;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -61,6 +63,10 @@ public class ChartViewImp extends View implements ChartView {
     private boolean mFocusHasChanged;
     //强制刷新聚焦变化
     private boolean mForceFlushFocusChanged;
+    //坐标系范围
+    private RectF mCoordinateRectF = new RectF();
+    //坐标系背景色画笔
+    private Paint mCoordinateBgPaint = new Paint();
     //长摁回调
     private Handler mLongClickHandler = new Handler() {
         @Override
@@ -103,6 +109,8 @@ public class ChartViewImp extends View implements ChartView {
         mViewContainer = new ViewContainer(mContext);//所有控件承载体
         mCoordinates = new Coordinates(mContext);//坐标系
         mCrossLine = new CrossLine(mContext);//十字线
+        mCoordinateBgPaint.setStyle(Paint.Style.FILL);
+        mCoordinateBgPaint.setColor(0xffffffff);
     }
 
     /**
@@ -255,6 +263,7 @@ public class ChartViewImp extends View implements ChartView {
      */
     public void setMarginLeft(int left) {
         this.coordinateMarginLeft = left;
+        mCoordinateRectF.left = this.coordinateMarginLeft;
         mViewContainer.setCoordinateMarginLeft(left);
         mCoordinates.setCoordinateMarginLeft(coordinateMarginLeft);
         mCrossLine.setCoordinateMarginLeft(coordinateMarginLeft);
@@ -266,12 +275,7 @@ public class ChartViewImp extends View implements ChartView {
      */
     private void setDrawRect(int width, int height) {
         //初始化高度
-        List<ViewContainer<Object>> list = mViewContainer.getChildrenList();
-        for (int i = 0; i < list.size(); i++) {
-            ViewContainer<Object> vc = list.get(i);
-            setDrawRect(vc, width, height);
-        }
-
+        setDrawRect(mViewContainer, width, height);
         setDrawRect(mCoordinates, width, height);
         setDrawRect(mCrossLine, width, height);
     }
@@ -283,6 +287,11 @@ public class ChartViewImp extends View implements ChartView {
         if (isHasBottomBlack && mCoordinates != null) {
             height = height - mCoordinates.getMarginBottom();//为底部留出空隙
         }
+
+        mCoordinateRectF.top = 0;
+        mCoordinateRectF.right = width;
+        mCoordinateRectF.bottom = height;
+
         vc.setCoordinateHeight(height);
         vc.setCoordinateWidth(width);
     }
@@ -420,6 +429,8 @@ public class ChartViewImp extends View implements ChartView {
         } else {//实时绘制
             snapshotSwitch(false);
             clearCanvas(canvas);
+            //绘制背景色
+            canvas.drawRect(mCoordinateRectF, mCoordinateBgPaint);
             mViewContainer.draw(canvas);
             mCoordinates.draw(canvas);
         }
@@ -518,7 +529,7 @@ public class ChartViewImp extends View implements ChartView {
                         event.getMetaState());
                 bundle.putParcelable("down_event", motionEvent);
                 message.setData(bundle);
-                mLongClickHandler.sendMessageDelayed(message, 200);
+                mLongClickHandler.sendMessageDelayed(message, 300);
                 mDownPointF.x = event.getX();
                 mDownPointF.y = event.getY();
                 break;
@@ -546,11 +557,13 @@ public class ChartViewImp extends View implements ChartView {
                 }
                 break;
             }
+            case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
+                mLongClickHandler.removeCallbacksAndMessages(null);
                 if (mCrossLine.isShow()) {
-                    mLongClickHandler.removeCallbacksAndMessages(null);
                     mCrossLine.move(event);
                 }
+                mCrossLine.setShow(false);
                 break;
             }
         }
@@ -608,6 +621,12 @@ public class ChartViewImp extends View implements ChartView {
         }
     }
 
+    /**
+     * 设置坐标系左边文字宽度
+     *
+     * @param charCount
+     * @return
+     */
     public float getCoordinateLeftTextWidth(int charCount) {
         if (mCoordinates != null) {
             return mCoordinates.getLeftTextWidth(charCount);
@@ -673,6 +692,13 @@ public class ChartViewImp extends View implements ChartView {
         if (mCoordinates != null) {
             mCoordinates.setDataList(dataList);
         }
+    }
+
+    /**
+     * 设置坐标系背景颜色
+     */
+    public void setCoordinateBackground(int color) {
+        mCoordinateBgPaint.setColor(color);
     }
 
     /**
