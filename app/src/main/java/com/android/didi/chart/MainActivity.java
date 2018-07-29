@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.android.tonystark.tonychart.chartview.adapter.BrokenLineCoordinateAdapter;
 import com.android.tonystark.tonychart.chartview.adapter.CandleCoordinateAdapter;
@@ -14,6 +15,7 @@ import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.Histogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.MACDHistogram;
+import com.android.tonystark.tonychart.chartview.viewbeans.ViewContainer;
 import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -179,6 +181,13 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mChartViewImp.setCoordinateLongitudeNum(4);
         //设置坐标系背景
         mChartViewImp.setCoordinateBackground(0xfffb8383);
+
+        mChartViewImp.setOnChartViewClickListener(new ChartViewImp.OnChartViewClickListener() {
+            @Override
+            public void onClick(View view, ViewContainer focused) {
+                Toast.makeText(view.getContext(), "click", Toast.LENGTH_LONG).show();
+            }
+        });
         //让图表视图更新
         mChartViewImp.invalidate();
     }
@@ -198,6 +207,12 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mChartSubViewImp.setCoordinateLatitudeNum(5);
         //设置坐标系经线(竖着的)个数,包含左边框和右边框
         mChartSubViewImp.setCoordinateLongitudeNum(4);
+        mChartSubViewImp.setOnChartViewClickListener(new ChartViewImp.OnChartViewClickListener() {
+            @Override
+            public void onClick(View view, ViewContainer focused) {
+                Toast.makeText(view.getContext(), "click", Toast.LENGTH_LONG).show();
+            }
+        });
         //让图表视图更新
         mChartSubViewImp.invalidate();
     }

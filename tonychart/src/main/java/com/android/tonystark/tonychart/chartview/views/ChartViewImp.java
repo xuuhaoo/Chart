@@ -67,11 +67,16 @@ public class ChartViewImp extends View implements ChartView {
     private RectF mCoordinateRectF = new RectF();
     //坐标系背景色画笔
     private Paint mCoordinateBgPaint = new Paint();
+    //点击事件
+    private OnChartViewClickListener mClickListener;
+    //是否是合法的点击
+    private boolean mIsValidClick;
     //长摁回调
     private Handler mLongClickHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mIsValidClick = false;
             if (msg != null) {
                 Bundle bundle = msg.getData();
                 if (bundle != null && mCrossLine != null && !mCrossLine.isShow()) {
@@ -484,12 +489,46 @@ public class ChartViewImp extends View implements ChartView {
         setDataMax(minmax[1]);
     }
 
+    public void dispatchClickEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                mIsValidClick = true;
+                mDownPointF.x = event.getX();
+                mDownPointF.y = event.getY();
+                break;
+            }
+            case MotionEvent.ACTION_POINTER_DOWN: {
+                mIsValidClick = false;
+                break;
+            }
+            case MotionEvent.ACTION_MOVE: {
+                //如果长按200毫秒还没达到时,如果滑动就设置isShowCrossLine为false
+                if (!mCrossLine.isShow()) {
+                    if (spacing(event) > 5) {
+                        mIsValidClick = false;
+                    }
+                } else if (mCrossLine.isShow()) {
+                    mIsValidClick = false;
+                }
+                break;
+            }
+            case MotionEvent.ACTION_CANCEL:
+                mIsValidClick = false;
+            case MotionEvent.ACTION_UP: {
+                if (mClickListener != null && mIsValidClick) {
+                    mClickListener.onClick(this, mFocusedView);
+                }
+                break;
+            }
+        }
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (isFollowed) {
-            return true;
+        dispatchClickEvent(event);
+        if (!isFollowed) {
+            onTouchEventPrivate(event);
         }
-        onTouchEventPrivate(event);
         return true;
     }
 
@@ -540,7 +579,6 @@ public class ChartViewImp extends View implements ChartView {
                     MotionEvent motionEvent = MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP, 0, 0, 0);
                     mLongClickHandler.removeCallbacksAndMessages(null);
                     mCrossLine.move(motionEvent);
-
                 }
                 break;
             }
@@ -708,8 +746,25 @@ public class ChartViewImp extends View implements ChartView {
         this.isHasBottomBlack = has;
     }
 
+    /**
+     * 获取十字光标线
+     */
     public CrossLine getCrossLine() {
         return mCrossLine;
+    }
+
+    /**
+     * 设置点击事件
+     */
+    public void setOnChartViewClickListener(OnChartViewClickListener clickListener) {
+        mClickListener = clickListener;
+    }
+
+    /**
+     * 点击事件
+     */
+    public interface OnChartViewClickListener {
+        void onClick(View view, ViewContainer focused);
     }
 
     private float spacing(MotionEvent event) {
