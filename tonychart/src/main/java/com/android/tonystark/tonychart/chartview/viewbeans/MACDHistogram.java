@@ -100,7 +100,12 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
                         mFillPaint.setColor(mEvenColor);
                     }
                     //画实心
-                    canvas.drawRect(leftTopPoint.x, leftTopPoint.y, rightBottomPoint.x, rightBottomPoint.y, mFillPaint);
+                    if (isFill) {
+                        canvas.drawRect(leftTopPoint.x, leftTopPoint.y, rightBottomPoint.x, rightBottomPoint.y, mFillPaint);
+                    } else {
+                        float width = leftTopPoint.x - rightBottomPoint.x;
+                        canvas.drawLine(leftTopPoint.x - width / 2f, leftTopPoint.y, rightBottomPoint.x + width / 2f, rightBottomPoint.y, mFillPaint);
+                    }
                 }
                 //改变坐标轴显示
                 notifyCoordinateChange();
@@ -117,7 +122,7 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
             float x = index * mPointWidth + mSpace + mCoordinateMarginLeft;
             float y = mCoordinateHeight / 2;
             if (bean.getMacd() > 0) {
-                y = (1f - bean.getMacd() / mYMax) * mCoordinateHeight / 2;
+                y = (1f - bean.getMacd() / (mYMax - mYMin)) * mCoordinateHeight / 2;
             }
             pointF.set(x, y);
         } else {
@@ -133,7 +138,7 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
         float x = (index + 1) * mPointWidth - mSpace + mCoordinateMarginLeft;
         float y = mCoordinateHeight / 2;
         if (bean.getMacd() < 0) {
-            y = (1f - bean.getMacd() / mYMin) * mCoordinateHeight / 2;
+            y = (1f - bean.getMacd() / (mYMax - mYMin)) * mCoordinateHeight / 2;
         }
         pointF.set(x, y);
         return pointF;
@@ -225,7 +230,6 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
                 }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
-//                isZooming = false;
                 break;
             case MotionEvent.ACTION_UP:
                 //标志位复位放在这里是因为很用户双手离开屏幕时可能还会移动一下，会先触发ACTION_POINTER_UP,再触发ACTION_UP,
@@ -419,11 +423,6 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
 
     public void setFill(boolean isFill) {
         this.isFill = isFill;
-        if (isFill) {
-            mFillPaint.setStyle(Paint.Style.FILL);
-        } else {
-            mFillPaint.setStyle(Paint.Style.STROKE);
-        }
     }
 
     public boolean isCalculateDataExtraNum() {
@@ -452,7 +451,6 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
                 dataList.add(bean.getMacd() + "");
             }
             float[] result = DataUtils.getExtremeNumber(dataList);
-            result[0] = 0;
             return result;
 
         }

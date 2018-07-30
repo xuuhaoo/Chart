@@ -34,8 +34,9 @@ import static com.android.tonystark.tonychart.chartview.viewbeans.Histogram.Hist
 import static com.android.tonystark.tonychart.chartview.viewbeans.Histogram.HistogramBean.RED;
 
 public class MainActivity extends AppCompatActivity implements CrossLine.OnCrossLineMoveListener {
-    public static final int MAX_DATA = 1000;
-    private JsonArray mJsonArray;
+    public static final int MAX_DATA = 500;
+    private JsonArray mKDataJsonArray;
+    private JsonArray mMACDDataJsonArray;
     private ChartViewImp mChartViewImp;
     private ChartViewImp mChartSubViewImp;
 
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 //删除主图所有组件
                 mChartViewImp.removeAllChildren();
                 //删除副图的所有组件
-//                mChartSubViewImp.removeAllChildren();
+                mChartSubViewImp.removeAllChildren();
 
                 //得到刚才创建好的组件
                 BrokenLine brokenLine = getBrokenLine();
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 mChartViewImp.setCoordinateScaleAdapter(new BrokenLineCoordinateAdapter(brokenLine));
                 //得到创建好的组件
                 MACDHistogram macdHistogram = getMACD();
+                macdHistogram.setFill(false);
                 //添加组件到副图中
                 //因为当前副图中组件数量为空,所以第一个添加的组件默认为focused(聚焦)组件,不用显示的调用requestFocuse()函数.
                 //当然显示的调用也是没有问题的.
@@ -322,10 +324,17 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
     private void inflateMockData() {
         InputStream is = null;
         BufferedReader reader = null;
+
+        InputStream is1 = null;
+        BufferedReader reader1 = null;
         try {
             is = getAssets().open("mock_data.json");
             reader = new BufferedReader(new InputStreamReader(is));
-            mJsonArray = new JsonParser().parse(reader).getAsJsonArray();
+            mKDataJsonArray = new JsonParser().parse(reader).getAsJsonArray();
+
+            is1 = getAssets().open("macd.json");
+            reader1 = new BufferedReader(new InputStreamReader(is1));
+            mMACDDataJsonArray = new JsonParser().parse(reader1).getAsJsonArray();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -339,12 +348,23 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            try {
+                is1.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                reader1.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public List<Histogram.HistogramBean> getHistogramData() {
         List<Histogram.HistogramBean> result = new ArrayList<>();
-        Iterator<JsonElement> it = mJsonArray.iterator();
+        Iterator<JsonElement> it = mKDataJsonArray.iterator();
         int index = 0;
         while (it.hasNext()) {
             if (index >= MAX_DATA) {
@@ -365,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
     public List<CandleLine.CandleLineBean> getCandleLineData() {
         List<CandleLine.CandleLineBean> result = new ArrayList<>();
-        Iterator<JsonElement> it = mJsonArray.iterator();
+        Iterator<JsonElement> it = mKDataJsonArray.iterator();
         int index = 0;
         while (it.hasNext()) {
             if (index >= MAX_DATA) {
@@ -387,15 +407,14 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
     public List<MACDHistogram.MACDBean> getMACDLineData() {
         List<MACDHistogram.MACDBean> result = new ArrayList<>();
-        Iterator<JsonElement> it = mJsonArray.iterator();
+        Iterator<JsonElement> it = mMACDDataJsonArray.iterator();
         int index = 0;
         while (it.hasNext()) {
             if (index >= MAX_DATA) {
                 break;
             }
             JsonElement element = it.next();
-            JsonObject jsonObject = element.getAsJsonObject();
-            MACDHistogram.MACDBean bean = new MACDHistogram.MACDBean(jsonObject.get("open").getAsFloat());
+            MACDHistogram.MACDBean bean = new MACDHistogram.MACDBean(element.getAsFloat());
             result.add(bean);
             index++;
         }
@@ -404,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
     public List<String> getBrokenLineData() {
         List<String> result = new ArrayList<>();
-        Iterator<JsonElement> it = mJsonArray.iterator();
+        Iterator<JsonElement> it = mKDataJsonArray.iterator();
         int index = 0;
         while (it.hasNext()) {
             if (index >= MAX_DATA) {
