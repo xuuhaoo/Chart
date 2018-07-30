@@ -4,6 +4,7 @@ import android.graphics.DashPathEffect;
 import android.graphics.PointF;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import static com.android.tonystark.tonychart.chartview.viewbeans.Histogram.HistogramBean.GREEN;
 import static com.android.tonystark.tonychart.chartview.viewbeans.Histogram.HistogramBean.RED;
@@ -43,6 +45,13 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
     private Button mAddKBtn;
     private Button mAddNowBtn;
     private Button mDeleteBtn;
+    private Button mChangedBtn;
+    private Button mStopChangedBtn;
+
+    private List<CandleLine.CandleLineBean> mKDataList;
+    private List<String> mPriceDataList;
+    private LoopThread mThread;
+    private CandleLine mCandleLine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mAddKBtn = findViewById(R.id.add_k_btn);
         mAddNowBtn = findViewById(R.id.add_now_btn);
         mDeleteBtn = findViewById(R.id.delete_btn);
+        mChangedBtn = findViewById(R.id.start_changed);
+        mStopChangedBtn = findViewById(R.id.stop_changed);
 
         inflateMockData();
         init();
@@ -79,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 mChartViewImp.setCoordinateScaleAdapter(new BrokenLineCoordinateAdapter(brokenLine));
                 //得到创建好的组件
                 MACDHistogram macdHistogram = getMACD();
-                macdHistogram.setFill(false);
                 //添加组件到副图中
                 //因为当前副图中组件数量为空,所以第一个添加的组件默认为focused(聚焦)组件,不用显示的调用requestFocuse()函数.
                 //当然显示的调用也是没有问题的.
@@ -104,18 +114,18 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 mChartViewImp.addChild(brokenLine);
 
                 //得到创建好的组件
-                CandleLine candleLine = getCandleLine();
+                mCandleLine = getCandleLine();
                 //添加组件到主图中
-                mChartViewImp.addChild(candleLine);
+                mChartViewImp.addChild(mCandleLine);
                 //因为当前主视图中有折线组建了,
                 //但我们希望,主图中坐标系和其他值都以K线为准,所以我们
                 //设置K线图为当前聚焦组件,设置聚焦组件后,坐标系的最大最小值都会以当前聚焦的K线组件的最大最小值为准,在此坐标系中的其他组件也会以他为准
                 //如果多个组件在一个视图中同时都调用了requestFocuse,将以最后一个调用者为当前focused的组件
-                candleLine.requestFocuse();
-                candleLine.setExtremeCalculatorInterface(new MyExtremeCalculator(mChartViewImp));
+                mCandleLine.requestFocused();
+                mCandleLine.setExtremeCalculatorInterface(new MyExtremeCalculator(mChartViewImp));
 
                 //设置主图的坐标系刻度适配器(因为当前聚焦的是K线图,所以坐标系需要展示K线的刻度适配器)
-                mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter(candleLine));
+                mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter(mCandleLine));
 
                 //得到创建好的组件
                 Histogram histogram = getHistogram();
@@ -134,13 +144,59 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
             }
         });
 
+        mStopChangedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mThread != null) {
+                    mThread.shutdown();
+                }
+            }
+        });
+
+        mChangedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mThread != null) {
+                    mThread.shutdown();
+                } else {
+                    mThread = new LoopThread(getApplicationContext()) {
+                        private float getRandom(CandleLine.CandleLineBean bean) {
+                            Random random = new Random();
+                            float min = 1222.001f;
+                            float max = 1224.999f;
+                            float generatedFloat = min + random.nextFloat() * (max - min);
+                            return generatedFloat;
+                        }
+
+                        @Override
+                        protected void runInLoopThread() throws Exception {
+                            if (mKDataList.isEmpty()) {
+                                return;
+                            }
+                            CandleLine.CandleLineBean bean = mKDataList.get(mKDataList.size() - 1);
+                            float random = getRandom(bean);
+                            Log.i("random close", "" + random);
+                            bean.setHeightPrice(random);
+                            mChartViewImp.notifyNeedForceSyncDataWithFocused();
+                            mChartViewImp.postInvalidate();
+                            Thread.sleep(2000);
+                        }
+
+                        @Override
+                        protected void loopFinish(Exception e) {
+
+                        }
+                    };
+                }
+                mThread.start();
+            }
+        });
+
         initMainCrossLine();
         initSubCrossLine();
 
         initMainView();
         initSubView();
-
-
     }
 
     private void initMainCrossLine() {
@@ -272,15 +328,15 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
      */
     private CandleLine getCandleLine() {
         //获取假数据(这一步你可以省略)
-        List<CandleLine.CandleLineBean> list = getCandleLineData();
+        mKDataList = getCandleLineData();
         //构造一个K线组件
         CandleLine candleLine = new CandleLine(this);
         //设置该组件的数据
-        candleLine.setDataList(list);
+        candleLine.setDataList(mKDataList);
         //设置该组件默认显示的数据量
         candleLine.setDefaultShowPointNums(50);
         //设置该组件默认起始绘制的下标数
-        candleLine.setDrawPointIndex(list.size() - candleLine.getDefaultShowPointNums());
+        candleLine.setDrawPointIndex(mKDataList.size() - candleLine.getDefaultShowPointNums());
         //设置涨的颜色
         candleLine.setUpColor(0xfff5515f);
         //设置跌的颜色
@@ -302,15 +358,15 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
      */
     private BrokenLine getBrokenLine() {
         //获取假数据(这一步你可以省略)
-        List<String> list = getBrokenLineData();
+        mPriceDataList = getBrokenLineData();
         //构造一个折线组件
         BrokenLine brokenLine = new BrokenLine(this);
         //设置该折线组件的数据
-        brokenLine.setDataList(list);
+        brokenLine.setDataList(mPriceDataList);
         //设置该折线组件默认显示的数据量
         brokenLine.setDefaultShowPointNums(50);
         //设置该折线组件默认起始绘制的下标数
-        brokenLine.setDrawPointIndex(list.size() - brokenLine.getDefaultShowPointNums());
+        brokenLine.setDrawPointIndex(mPriceDataList.size() - brokenLine.getDefaultShowPointNums());
         //是否为折线组件填充背景色
         brokenLine.setFill(false);
         //设置折线的线的颜色

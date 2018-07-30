@@ -2,11 +2,11 @@ package com.android.tonystark.tonychart.chartview.viewbeans;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.RectF;
 import android.support.annotation.CallSuper;
 import android.util.TypedValue;
 import android.view.MotionEvent;
+
+import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
  * @version 1.0
  */
 public class ViewContainer<T extends Object> {
-    private ChartView mChartView;
+    private ChartViewImp mChartView;
     //是否请求了焦点,因为可能此时还没有被添加,添加的时候再做处理
     private boolean isRequestFocused;
     //上下文
@@ -270,7 +270,7 @@ public class ViewContainer<T extends Object> {
      * 请求变为焦点View,画板内的公共数据将以此组件为主
      */
     @CallSuper
-    public void requestFocuse() {
+    public void requestFocused() {
         if (mChartView != null) {
             mChartView.requestFocusChild(this);
         } else {
@@ -312,18 +312,15 @@ public class ViewContainer<T extends Object> {
         for (ViewContainer container : getChildrenList()) {
             container.setDrawPointIndex(this.mDrawPointIndex);
         }
-        if (mChartView != null) {
-            this.mChartView.notifyNeedForceFlushData();
-        }
     }
 
     /**
-     * 设置当前显示数据个数,此方法正常情况下是不处理的.因为该值是通过内部计算得出的
+     * 设置当前显示数据个数
      *
      * @param shownPointNums
      */
     void setShownPointNums(int shownPointNums) {
-        //do nothing 因为这个正常情况下是内部计算获得的
+        //应该计算获得,不应该赋值
     }
 
     /**
@@ -355,9 +352,6 @@ public class ViewContainer<T extends Object> {
         for (ViewContainer container : getChildrenList()) {
             container.setMinShownPointNums(this.mMinShownPointNums);
         }
-        if (mChartView != null) {
-            this.mChartView.notifyNeedForceFlushData();
-        }
     }
 
     /**
@@ -376,13 +370,23 @@ public class ViewContainer<T extends Object> {
      */
     @CallSuper
     public void setDefaultShowPointNums(int defaultShowPointNums) {
+        setDefaultShowPointNums(defaultShowPointNums, true);
+    }
+
+    /**
+     * 设置默认显示的数据个数,支持同步设置显示的点数
+     *
+     * @param defaultShowPointNums
+     * @param syncShowPointNums
+     */
+    @CallSuper
+    public void setDefaultShowPointNums(int defaultShowPointNums, boolean syncShowPointNums) {
         this.mDefaultShowPointNums = defaultShowPointNums;
-        this.mShownPointNums = this.mDefaultShowPointNums;
-        for (ViewContainer container : getChildrenList()) {
-            container.setDefaultShowPointNums(defaultShowPointNums);
+        if (syncShowPointNums) {
+            this.mShownPointNums = this.mDefaultShowPointNums;
         }
-        if (mChartView != null) {
-            this.mChartView.notifyNeedForceFlushData();
+        for (ViewContainer container : getChildrenList()) {
+            container.setDefaultShowPointNums(defaultShowPointNums, syncShowPointNums);
         }
     }
 
@@ -392,11 +396,11 @@ public class ViewContainer<T extends Object> {
      * @param chartView
      */
     @CallSuper
-    public void setChartView(ChartView chartView) {
+    public void setChartView(ChartViewImp chartView) {
         mChartView = chartView;
         if (isRequestFocused) {
             isRequestFocused = false;
-            requestFocuse();
+            requestFocused();
         }
         for (ViewContainer container : getChildrenList()) {
             container.setChartView(mChartView);
@@ -461,9 +465,6 @@ public class ViewContainer<T extends Object> {
     public void setDataList(List<T> dataList) {
         mDataList = dataList;
         mCrossDataList = transDataToCrossDataFromDataList(mDataList);
-        if (mChartView != null) {
-            this.mChartView.notifyNeedForceFlushData();
-        }
     }
 
     /**

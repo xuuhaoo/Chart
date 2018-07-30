@@ -15,22 +15,34 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/start_changed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="启动数据改变" />
+
+        <Button
+            android:id="@+id/stop_changed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="停止数据改变" />
+
+        <Button
             android:id="@+id/add_k_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="添加K线及MA线" />
+            android:text="切换K" />
 
         <Button
             android:id="@+id/add_now_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="添加分时线" />
+            android:text="切换分时" />
 
         <Button
             android:id="@+id/delete_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="删除所有" />
+            android:text="Clear" />
 
     </LinearLayout>
 

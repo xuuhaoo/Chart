@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.MotionEvent;
 
 
@@ -329,10 +330,12 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
             //减少点数
             mShownPointNums = mShownPointNums - scale;
             mShownPointNums = mShownPointNums < mMinShownPointNums ? mMinShownPointNums : mShownPointNums;
+            Log.i("zoomIn", "mShownPointNums:" + mShownPointNums);
             return true;
         } else {
             //此时显示的点数应该等于最小点数
             mShownPointNums = mMinShownPointNums;
+            Log.i("zoomIn", "mShownPointNums:" + mShownPointNums);
             return false;
         }
     }

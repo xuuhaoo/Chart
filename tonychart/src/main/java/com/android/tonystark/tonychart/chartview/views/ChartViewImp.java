@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.PathEffect;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -62,7 +61,9 @@ public class ChartViewImp extends View implements ChartView {
     //聚焦是否变化
     private boolean mFocusHasChanged;
     //强制刷新聚焦变化
-    private boolean mForceFlushFocusChanged;
+    private boolean mForceSyncFocusChanged;
+    //重新计算极值
+    private boolean mReCalculateExtreme;
     //坐标系范围
     private RectF mCoordinateRectF = new RectF();
     //坐标系背景色画笔
@@ -139,9 +140,9 @@ public class ChartViewImp extends View implements ChartView {
         vc.setMinDataValue(mViewContainer.getMinDataValue());
         //保证聚焦组件不为空
         if (mFocusedView == null) {
-            vc.requestFocuse();
+            vc.requestFocused();
         }
-        mForceFlushFocusChanged = true;
+        mForceSyncFocusChanged = true;
         invalidate();
     }
 
@@ -177,11 +178,11 @@ public class ChartViewImp extends View implements ChartView {
     }
 
     /**
-     * 通知焦点模块数据改变,其他的模块需要刷新数据
+     * 通知焦点模块数据改变,其他的模块需要刷新数据,与聚焦的View同步
      */
     @Override
-    public void notifyNeedForceFlushData() {
-        mForceFlushFocusChanged = true;
+    public void notifyNeedForceSyncDataWithFocused() {
+        mForceSyncFocusChanged = true;
     }
 
     /**
@@ -427,13 +428,19 @@ public class ChartViewImp extends View implements ChartView {
     @Override
     final protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
-        if (isFocusHasChanged() || mForceFlushFocusChanged) {
+        //同步数据与焦点View
+        if (isFocusHasChanged() || mForceSyncFocusChanged) {
             Log.i("OnDraw", "flush the focus data");
             mFocusHasChanged = false;
             changedFocusDataPreDraw();
             //在最后保证changedFocusDataPreDraw函数执行完后还原forceflush状态.
-            mForceFlushFocusChanged = false;
+            mForceSyncFocusChanged = false;
+            //这里面已经重新计算过了,所以不需要后面重新计算
+            mReCalculateExtreme = false;
+        }
+        if (mReCalculateExtreme) {
+            extremeYSyncWithFocusedView();
+            mReCalculateExtreme = false;
         }
         if (isSnapshotOpen && mSnapshotBitmap != null && !isFocusHasChanged()) {   //绘制快照
             canvas.drawBitmap(mSnapshotBitmap, 0, 0, null);
@@ -448,6 +455,22 @@ public class ChartViewImp extends View implements ChartView {
         if (mCrossLine != null) {
             mCrossLine.draw(canvas);
         }
+    }
+
+    /**
+     * 同步坐标系极值与焦点View同步
+     */
+    private void extremeYSyncWithFocusedView() {
+        //设置横纵坐坐标极值
+        float[] minmax = mFocusedView.calculateExtremeY();
+        //设置Y轴最小值
+        setYMin(minmax[0]);
+        //设置Y轴最大值
+        setYMax(minmax[1]);
+        //设置数据最大值
+        setDataMin(minmax[0]);
+        //设置数据最小值
+        setDataMax(minmax[1]);
     }
 
     private void changedFocusDataPreDraw() {
@@ -473,35 +496,27 @@ public class ChartViewImp extends View implements ChartView {
         }
 
         //设置其他的组件默认显示组件点数,跟随焦点组件
-        mViewContainer.setDefaultShowPointNums(mFocusedView.getDefaultShowPointNums());
+        mViewContainer.setDefaultShowPointNums(mFocusedView.getDefaultShowPointNums(), false);
         //设置其他的组件数据开始绘制下标,跟随焦点组件
         mViewContainer.setDrawPointIndex(mFocusedView.getDrawPointIndex());
         //设置最少能显示的数据个数,跟随焦点组件
         mViewContainer.setMinShownPointNums(mFocusedView.getMinShownPointNums());
+
         //设置其他组件不计算坐标系最大最小值
         mViewContainer.setCalculateDataExtremum(false);
         //一定要在ViewContainer设置之后设置,设置焦点View计算最大最小值
         mFocusedView.setCalculateDataExtremum(true);
-
-        //设置横纵坐坐标极值
-        float[] minmax = mFocusedView.calculateExtremeY();
-        //设置Y轴最小值
-        setYMin(minmax[0]);
-        //设置Y轴最大值
-        setYMax(minmax[1]);
-        //设置数据最大值
-        setDataMin(minmax[0]);
-        //设置数据最小值
-        setDataMax(minmax[1]);
+        //同步坐标系极值
+        extremeYSyncWithFocusedView();
 
         //设置跟随的View中的焦点View
         if (mFollowView != null && mFollowView.getFocusedView() != null) {
             ViewContainer followFocusedView = mFollowView.getFocusedView();
-            followFocusedView.setDefaultShowPointNums(mFocusedView.getDefaultShowPointNums());
+            followFocusedView.setDefaultShowPointNums(mFocusedView.getDefaultShowPointNums(), false);
             followFocusedView.setDrawPointIndex(mFocusedView.getDrawPointIndex());
             followFocusedView.setMinShownPointNums(mFocusedView.getMinShownPointNums());
 
-            mFollowView.notifyNeedForceFlushData();
+            mFollowView.notifyNeedForceSyncDataWithFocused();
         }
     }
 
@@ -773,6 +788,13 @@ public class ChartViewImp extends View implements ChartView {
      */
     public void setOnChartViewClickListener(OnChartViewClickListener clickListener) {
         mClickListener = clickListener;
+    }
+
+    /**
+     * 请求计算极值
+     */
+    public void requestCalculateExtreme(boolean reCalculateExtreme) {
+        mReCalculateExtreme = reCalculateExtreme;
     }
 
     /**
