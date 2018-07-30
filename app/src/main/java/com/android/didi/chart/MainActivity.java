@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 //删除主图所有组件
                 mChartViewImp.removeAllChildren();
                 //删除副图的所有组件
-                mChartSubViewImp.removeAllChildren();
+//                mChartSubViewImp.removeAllChildren();
 
                 //得到刚才创建好的组件
                 BrokenLine brokenLine = getBrokenLine();
@@ -76,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 mChartViewImp.addChild(brokenLine);
                 //设置主图的坐标系刻度适配器(因为当前聚焦的是折线图,所以坐标系需要展示折线的刻度适配器)
                 mChartViewImp.setCoordinateScaleAdapter(new BrokenLineCoordinateAdapter(brokenLine));
-
                 //得到创建好的组件
                 MACDHistogram macdHistogram = getMACD();
                 //添加组件到副图中
@@ -158,10 +157,6 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         CrossLine crossLine = mChartSubViewImp.getCrossLine();
         //设置主图十字线颜色
         crossLine.setLineColor(0xffFE7F3F);
-        //设置主图十字线滑动监听器,this表示当前类实现了该接口
-        crossLine.setOnCrossLineMoveListener(this);
-        //设置纬线不跟数据
-        crossLine.setLatitudeFollowData(false);
         //设置不显示纬线
         crossLine.setShowLatitude(false);
     }
@@ -180,8 +175,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置坐标系经线(竖着的)个数,包含左边框和右边框
         mChartViewImp.setCoordinateLongitudeNum(4);
         //设置坐标系背景
-        mChartViewImp.setCoordinateBackground(0xfffb8383);
-
+        mChartViewImp.setCoordinateBackground(0xfff2efef);
+        //设置点击事件
         mChartViewImp.setOnChartViewClickListener(new ChartViewImp.OnChartViewClickListener() {
             @Override
             public void onClick(View view, ViewContainer focused) {
@@ -207,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mChartSubViewImp.setCoordinateLatitudeNum(5);
         //设置坐标系经线(竖着的)个数,包含左边框和右边框
         mChartSubViewImp.setCoordinateLongitudeNum(4);
+        //设置点击事件
         mChartSubViewImp.setOnChartViewClickListener(new ChartViewImp.OnChartViewClickListener() {
             @Override
             public void onClick(View view, ViewContainer focused) {
@@ -321,17 +317,6 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
     }
 
 
-    @Override
-    public void onCrossLineMove(int index, int drawIndex, PointF pointF) {
-        mChartSubViewImp.getCrossLine().setPointF(pointF);
-        mChartSubViewImp.invalidate();
-    }
-
-    @Override
-    public void onCrossLineDismiss() {
-    }
-
-
     //======================================================以下内容不需要关心,为构造假数据使用======================================================
 
     private void inflateMockData() {
@@ -434,4 +419,14 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         return result;
     }
 
+
+    @Override
+    public void onCrossLineMove(int index, int drawIndex, PointF pointF) {
+
+    }
+
+    @Override
+    public void onCrossLineDismiss() {
+
+    }
 }

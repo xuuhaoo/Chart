@@ -71,6 +71,10 @@ public class ChartViewImp extends View implements ChartView {
     private OnChartViewClickListener mClickListener;
     //是否是合法的点击
     private boolean mIsValidClick;
+    //fake action down为了长按
+    private MotionEvent mMotionEvent = null;
+    //长按的delay消息what值
+    private static final int LONG_CLICK_MSG_WHAT = 1000010;
     //长摁回调
     private Handler mLongClickHandler = new Handler() {
         @Override
@@ -78,9 +82,8 @@ public class ChartViewImp extends View implements ChartView {
             super.handleMessage(msg);
             mIsValidClick = false;
             if (msg != null) {
-                Bundle bundle = msg.getData();
-                if (bundle != null && mCrossLine != null && !mCrossLine.isShow()) {
-                    MotionEvent event = bundle.getParcelable("down_event");
+                if (mCrossLine != null && !mCrossLine.isShow() && msg.obj != null) {
+                    MotionEvent event = (MotionEvent) msg.obj;
                     mCrossLine.move(event);
                     invalidate();
                 }
@@ -165,6 +168,9 @@ public class ChartViewImp extends View implements ChartView {
                     mFocusHasChanged = true;
                     mFocusedView = temp;
                     invalidate();
+                    if (mFollowView != null) {
+                        mFollowView.invalidate();
+                    }
                 }
             }
         }
@@ -487,6 +493,16 @@ public class ChartViewImp extends View implements ChartView {
         setDataMin(minmax[0]);
         //设置数据最小值
         setDataMax(minmax[1]);
+
+        //设置跟随的View中的焦点View
+        if (mFollowView != null && mFollowView.getFocusedView() != null) {
+            ViewContainer followFocusedView = mFollowView.getFocusedView();
+            followFocusedView.setDefaultShowPointNums(mFocusedView.getDefaultShowPointNums());
+            followFocusedView.setDrawPointIndex(mFocusedView.getDrawPointIndex());
+            followFocusedView.setMinShownPointNums(mFocusedView.getMinShownPointNums());
+
+            mFollowView.notifyNeedForceFlushData();
+        }
     }
 
     public void dispatchClickEvent(MotionEvent event) {
@@ -559,15 +575,14 @@ public class ChartViewImp extends View implements ChartView {
             case MotionEvent.ACTION_DOWN: {
                 //当按下时,延迟200毫秒.避免滑动时,会显示十字线
                 Message message = new Message();
-                Bundle bundle = new Bundle();
-                MotionEvent motionEvent = MotionEvent.obtain(event.getDownTime(),
+                mMotionEvent = MotionEvent.obtain(event.getDownTime(),
                         event.getEventTime(),
                         MotionEvent.ACTION_DOWN,
                         event.getX(),
                         event.getY(),
                         event.getMetaState());
-                bundle.putParcelable("down_event", motionEvent);
-                message.setData(bundle);
+                message.what = LONG_CLICK_MSG_WHAT;
+                message.obj = mMotionEvent;
                 mLongClickHandler.sendMessageDelayed(message, 300);
                 mDownPointF.x = event.getX();
                 mDownPointF.y = event.getY();
@@ -577,7 +592,7 @@ public class ChartViewImp extends View implements ChartView {
                 //当2指按下触摸时,模拟up事件发送,让十字线不显示
                 if (mCrossLine.isShow() && event.getPointerCount() >= 2) {
                     MotionEvent motionEvent = MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP, 0, 0, 0);
-                    mLongClickHandler.removeCallbacksAndMessages(null);
+                    mLongClickHandler.removeMessages(LONG_CLICK_MSG_WHAT, mMotionEvent);
                     mCrossLine.move(motionEvent);
                 }
                 break;
@@ -586,7 +601,7 @@ public class ChartViewImp extends View implements ChartView {
                 //如果长按200毫秒还没达到时,如果滑动就设置isShowCrossLine为false
                 if (!mCrossLine.isShow()) {
                     if (spacing(event) > 5) {
-                        mLongClickHandler.removeCallbacksAndMessages(null);
+                        mLongClickHandler.removeMessages(LONG_CLICK_MSG_WHAT, mMotionEvent);
                         mCrossLine.setShow(false);
                     }
                 } else if (mCrossLine.isShow()) {
@@ -597,7 +612,7 @@ public class ChartViewImp extends View implements ChartView {
             }
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
-                mLongClickHandler.removeCallbacksAndMessages(null);
+                mLongClickHandler.removeMessages(LONG_CLICK_MSG_WHAT, mMotionEvent);
                 if (mCrossLine.isShow()) {
                     mCrossLine.move(event);
                 }

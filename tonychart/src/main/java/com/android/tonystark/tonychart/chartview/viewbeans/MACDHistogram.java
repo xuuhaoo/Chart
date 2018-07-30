@@ -100,7 +100,7 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
                         mFillPaint.setColor(mEvenColor);
                     }
                     //画实心
-                    canvas.drawLine(leftTopPoint.x, leftTopPoint.y, rightBottomPoint.x, rightBottomPoint.y, mFillPaint);
+                    canvas.drawRect(leftTopPoint.x, leftTopPoint.y, rightBottomPoint.x, rightBottomPoint.y, mFillPaint);
                 }
                 //改变坐标轴显示
                 notifyCoordinateChange();
@@ -114,7 +114,7 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
         mSpace = mPointWidth / 7;
 
         if (mDataList.size() - 1 >= index) {
-            float x = index * mPointWidth + mCoordinateMarginLeft + mPointWidth / 2;
+            float x = index * mPointWidth + mSpace + mCoordinateMarginLeft;
             float y = mCoordinateHeight / 2;
             if (bean.getMacd() > 0) {
                 y = (1f - bean.getMacd() / mYMax) * mCoordinateHeight / 2;
@@ -130,10 +130,10 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
         PointF pointF = new PointF();
         mPointWidth = (mCoordinateWidth - mCoordinateMarginLeft) / mShownPointNums;
         mSpace = mPointWidth / 7;
-        float x = index * mPointWidth + mCoordinateMarginLeft + mPointWidth / 2;
+        float x = (index + 1) * mPointWidth - mSpace + mCoordinateMarginLeft;
         float y = mCoordinateHeight / 2;
         if (bean.getMacd() < 0) {
-            y = (1f - bean.getMacd() / mYMax) * mCoordinateHeight / 2;
+            y = (1f - bean.getMacd() / mYMin) * mCoordinateHeight / 2;
         }
         pointF.set(x, y);
         return pointF;
@@ -457,5 +457,14 @@ public class MACDHistogram extends ViewContainer<MACDHistogram.MACDBean> {
 
         }
         return new float[]{0, 0};
+    }
+
+    @Override
+    protected List<String> transDataToCrossDataFromDataList(List<MACDBean> originDataList) {
+        List<String> result = super.transDataToCrossDataFromDataList(originDataList);
+        for (MACDBean bean : originDataList) {
+            result.add(bean.getMacd() + "");
+        }
+        return result;
     }
 }

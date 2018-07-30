@@ -416,4 +416,13 @@ public class Histogram extends ViewContainer<Histogram.HistogramBean> {
         }
         return new float[]{0, 0};
     }
+
+    @Override
+    protected List<String> transDataToCrossDataFromDataList(List<HistogramBean> originDataList) {
+        List<String> result = super.transDataToCrossDataFromDataList(originDataList);
+        for (HistogramBean bean : originDataList) {
+            result.add(bean.getTurnover() + "");
+        }
+        return result;
+    }
 }
