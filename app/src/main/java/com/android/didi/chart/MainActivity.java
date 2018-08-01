@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置主图十字线滑动监听器,this表示当前类实现了该接口
         crossLine.setOnCrossLineMoveListener(this);
         //设置纬线不跟数据
-        crossLine.setLatitudeFollowData(false);
+//        crossLine.setLatitudeFollowData(false);
     }
 
     private void initSubCrossLine() {
@@ -532,7 +532,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
     @Override
     public void onCrossLineMove(int index, int drawIndex, PointF pointF) {
-
+        Log.i("onCrossLineMove", "index:" + index + " drawIndex:" + drawIndex);
     }
 
     @Override

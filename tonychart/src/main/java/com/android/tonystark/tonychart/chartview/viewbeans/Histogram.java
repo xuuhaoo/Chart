@@ -205,11 +205,13 @@ public class Histogram extends AbsZoomMoveViewContainer<Histogram.HistogramBean>
     }
 
     @Override
-    protected List<String> transDataToCrossDataFromDataList(List<HistogramBean> originDataList) {
-        List<String> result = super.transDataToCrossDataFromDataList(originDataList);
-        for (HistogramBean bean : originDataList) {
-            result.add(bean.getTurnover() + "");
+    protected float transDataToCrossDataFromDataList(int crossPointIndexInScreen, int dataInListIndex) {
+        if (dataInListIndex >= mDataList.size()) {
+            return super.transDataToCrossDataFromDataList(crossPointIndexInScreen, dataInListIndex);
         }
-        return result;
+
+        HistogramBean bean = mDataList.get(dataInListIndex);
+        return bean.getTurnover();
     }
+
 }

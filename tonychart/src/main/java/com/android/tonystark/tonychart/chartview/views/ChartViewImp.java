@@ -117,8 +117,13 @@ public class ChartViewImp extends View implements ChartView {
     private void initObject() {
         this.setBackgroundColor(0xffffffff);
         mViewContainer = new ViewContainer(mContext);//所有控件承载体
+        mViewContainer.setChartView(this);
+
         mCoordinates = new Coordinates(mContext);//坐标系
+        mCoordinates.setChartView(this);
         mCrossLine = new CrossLine(mContext);//十字线
+        mCrossLine.setChartView(this);
+
         mCoordinateBgPaint.setStyle(Paint.Style.FILL);
         mCoordinateBgPaint.setColor(0xffffffff);
     }
@@ -518,8 +523,6 @@ public class ChartViewImp extends View implements ChartView {
             mCrossLine.setShownPointNums(mFocusedView.getShownPointNums());
             //设置十字线单点偏移量,跟随焦点组件
             mCrossLine.setSinglePointOffset(mFocusedView.getSingleDataWidth() / 2);
-            //设置十字线需要展示的数据集,跟随焦点组件
-            mCrossLine.setDataList(mFocusedView.getCrossDataList());
         }
 
         //设置坐标系参数
@@ -608,8 +611,6 @@ public class ChartViewImp extends View implements ChartView {
                 mCrossLine.setSinglePointOffset(mFocusedView.getSingleDataWidth() / 2);
                 //设置十字线组件数据开始绘制下标,跟随焦点组件
                 mCrossLine.setDrawPointIndex(mFocusedView.getDrawPointIndex());
-                //设置十字线需要展示的数据集,跟随焦点组件
-                mCrossLine.setDataList(mFocusedView.getCrossDataList());
             }
             //确定所有组件不计算大小
             mViewContainer.setCalculateDataExtremum(false);

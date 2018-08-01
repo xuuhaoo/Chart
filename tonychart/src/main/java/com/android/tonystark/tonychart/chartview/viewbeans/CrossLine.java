@@ -9,6 +9,8 @@ import android.view.MotionEvent;
 
 import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
 
+import java.util.List;
+
 /**
  * 描述：十字线
  *
@@ -46,6 +48,8 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
     private float mPointWidth = 0;
     //十字拖动监听器
     private OnCrossLineMoveListener mOnCrossLineMoveListener = null;
+    //当前聚焦的View
+    private ViewContainer mFocusedView;
 
     public CrossLine(Context context) {
         super(context);
@@ -73,15 +77,20 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
         try {
             if (isShow) {
                 checkParameter();
+                if (initFocusedView()) return;
                 //计算点的宽度
                 mPointWidth = (mCoordinateWidth - mCoordinateMarginLeft) / mShownPointNums;
                 //计算触摸的
                 mIndex = (int) ((mPointF.x - mCoordinateMarginLeft) / mPointWidth);
+                if (mIndex >= mShownPointNums) {
+                    mIndex = mShownPointNums - 1;
+                }
                 //尽在显示区域内绘制十字线
                 if (mDrawPointIndex + mIndex < mDrawPointIndex + mShownPointNums) {
+                    float currentValue = mFocusedView.transDataToCrossDataFromDataList(mIndex, mIndex + mDrawPointIndex);
                     if (isShowLatitude) {
                         //绘制纬线
-                        drawLatitude(canvas, mIndex);
+                        drawLatitude(canvas, mIndex, currentValue);
                     }
                     if (isShowLongitude) {
                         //绘制经线
@@ -89,12 +98,25 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
                     }
                     if (isShowPoint) {
                         //绘制点
-                        drawCircle(canvas, mIndex);
+                        drawCircle(canvas, mIndex, currentValue);
                     }
                 }
             }
         } catch (Exception ignored) {
         }
+    }
+
+    private boolean initFocusedView() {
+        ChartView chartView = getChartView();
+        if (chartView == null) {
+            return true;
+        }
+
+        mFocusedView = chartView.getFocusedView();
+        if (mFocusedView == null) {
+            return true;
+        }
+        return false;
     }
 
     private void checkParameter() {
@@ -113,21 +135,13 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
     }
 
     //绘制纬线
-    private void drawLatitude(Canvas canvas, int index) {
+    private void drawLatitude(Canvas canvas, int index, float currentValue) {
         float y = mPointF.y;
         if (isLatitudeFollowData) {
-            if (!mDataList.isEmpty() && index <= mDataList.size() - 1) {
-                try {
-                    y = (1f - (Float.parseFloat(mDataList.get(index + mDrawPointIndex)) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
-                } catch (NumberFormatException e) {
-                    y = mPointF.y;
-                }
-            } else if (!mDataList.isEmpty()) {
-                try {
-                    y = (1f - (Float.parseFloat(mDataList.get(mDataList.size() - 1)) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
-                } catch (NumberFormatException e) {
-                    y = mPointF.y;
-                }
+            try {
+                y = (1f - (currentValue - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+            } catch (NumberFormatException e) {
+                y = mPointF.y;
             }
         }
         canvas.drawLine(mCoordinateMarginLeft, y, mCoordinateWidth, y, mLinePaint);
@@ -137,44 +151,24 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
     private void drawLongitude(Canvas canvas, int index) {
         float x = mPointF.x;
         if (isLongitudeFollowData) {
-            if (!mDataList.isEmpty() && index <= mDataList.size() - 1) {
-                x = index * mPointWidth + mCoordinateMarginLeft;
-            } else if (!mDataList.isEmpty()) {
-                x = (mDataList.size() - 1) * mPointWidth + mCoordinateMarginLeft;
-            }
-            x += mSinglePointOffset;
+            x = index * mPointWidth + mCoordinateMarginLeft + mSinglePointOffset;
         }
         canvas.drawLine(x, 0, x, mCoordinateHeight, mLinePaint);
     }
 
-    private void drawCircle(Canvas canvas, int index) {
+    private void drawCircle(Canvas canvas, int index, float currentValue) {
         float x = mPointF.x;
         float y = mPointF.y;
-        if (!mDataList.isEmpty() && index <= mDataList.size() - 1) {
-            try {
-                x = index * mPointWidth + mCoordinateMarginLeft;
-            } catch (NumberFormatException e) {
-                x = mPointF.x;
-            }
-            try {
-                y = (1f - (Float.parseFloat(mDataList.get(index + mDrawPointIndex)) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
-            } catch (NumberFormatException e) {
-                y = mPointF.y;
-            }
-        } else if (!mDataList.isEmpty()) {
-            try {
-                x = (mDataList.size() - 1) * mPointWidth + mCoordinateMarginLeft;
-            } catch (NumberFormatException e) {
-                x = mPointF.x;
-            }
-            try {
-                y = (1f - (Float.parseFloat(mDataList.get(mDataList.size() - 1)) - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
-            } catch (NumberFormatException e) {
-                y = mPointF.y;
-            }
-            x += mSinglePointOffset;
+        try {
+            x = index * mPointWidth + mCoordinateMarginLeft + mSinglePointOffset;
+        } catch (NumberFormatException e) {
+            x = mPointF.x;
         }
-
+        try {
+            y = (1f - (currentValue - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+        } catch (NumberFormatException e) {
+            y = mPointF.y;
+        }
         canvas.drawCircle(x, y, mRadius, mPointPaint);
     }
 
@@ -183,13 +177,17 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
         int index;
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                if (initFocusedView()) return;
                 mPointF.x = event.getX();
                 mPointF.x = mPointF.x < mCoordinateMarginLeft ? mCoordinateMarginLeft : mPointF.x;
                 mPointWidth = (mCoordinateWidth - mCoordinateMarginLeft) / mShownPointNums;
                 index = (int) ((mPointF.x - mCoordinateMarginLeft) / mPointWidth);
-                if (!mDataList.isEmpty() && index > mDataList.size() - 1) {
-                    mPointF.x = (mDataList.size() - 1) * mPointWidth + mCoordinateMarginLeft;
-                    index = mDataList.size() - 1;
+                if (mFocusedView.getDataListSize() > 0 && index > mFocusedView.getDataListSize() - 1) {
+                    index = mFocusedView.getDataListSize() - 1;
+                    mPointF.x = index * mPointWidth + mCoordinateMarginLeft;
+                }
+                if (index >= mShownPointNums) {
+                    index = mShownPointNums - 1;
                 }
                 mPointF.y = event.getY();
                 setShow(true);
@@ -201,9 +199,12 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
                 mPointF.x = event.getX();
                 mPointF.x = mPointF.x < mCoordinateMarginLeft ? mCoordinateMarginLeft : mPointF.x;
                 index = (int) ((mPointF.x - mCoordinateMarginLeft) / mPointWidth);
-                if (!mDataList.isEmpty() && index > mDataList.size() - 1) {
-                    mPointF.x = (mDataList.size() - 1) * mPointWidth + mCoordinateMarginLeft;
-                    index = mDataList.size() - 1;
+                if (mFocusedView.getDataListSize() > 0 && index > mFocusedView.getDataListSize() - 1) {
+                    index = mFocusedView.getDataListSize() - 1;
+                    mPointF.x = index * mPointWidth + mCoordinateMarginLeft;
+                }
+                if (index >= mShownPointNums) {
+                    index = mShownPointNums - 1;
                 }
                 mPointF.y = event.getY();
                 if (mOnCrossLineMoveListener != null) {
@@ -228,6 +229,11 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
 
     public void setOnCrossLineMoveListener(OnCrossLineMoveListener lineMoveListener) {
         this.mOnCrossLineMoveListener = lineMoveListener;
+    }
+
+    @Override
+    public void setDataList(List<String> dataList) {
+        //该组件不需要数据
     }
 
     public int getRadius() {

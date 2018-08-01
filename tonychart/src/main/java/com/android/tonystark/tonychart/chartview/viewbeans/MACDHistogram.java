@@ -208,7 +208,8 @@ public class MACDHistogram extends AbsZoomMoveViewContainer<MACDHistogram.MACDBe
     }
 
     public void setFill(boolean isFill) {
-        this.isFill = isFill;
+        //TODO 日后付费修复
+//        this.isFill = isFill;
     }
 
     public boolean isCalculateDataExtraNum() {
@@ -243,12 +244,14 @@ public class MACDHistogram extends AbsZoomMoveViewContainer<MACDHistogram.MACDBe
         return new float[]{0, 0};
     }
 
+
     @Override
-    protected List<String> transDataToCrossDataFromDataList(List<MACDBean> originDataList) {
-        List<String> result = super.transDataToCrossDataFromDataList(originDataList);
-        for (MACDBean bean : originDataList) {
-            result.add(bean.getMacd() + "");
+    protected float transDataToCrossDataFromDataList(int crossPointIndexInScreen, int dataInListIndex) {
+        if (dataInListIndex >= mDataList.size()) {
+            return super.transDataToCrossDataFromDataList(crossPointIndexInScreen, dataInListIndex);
         }
-        return result;
+
+        MACDBean bean = mDataList.get(dataInListIndex);
+        return bean.getMacd();
     }
 }

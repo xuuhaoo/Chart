@@ -483,20 +483,19 @@ public class ViewContainer<T extends Object> {
      *
      * @param dataList
      */
-    @CallSuper
     public void setDataList(List<T> dataList) {
         mDataList = dataList;
-        mCrossDataList = transDataToCrossDataFromDataList(mDataList);
     }
 
     /**
      * 格式化数据为十字线所用的数据
      *
-     * @param originDataList 原始数据
+     * @param crossPointIndexInScreen 当前屏幕的下标
+     * @param dataInListIndex         该数据在集合中的下标
      * @return 十字线能用的String类型的浮点数据
      */
-    protected List<String> transDataToCrossDataFromDataList(List<T> originDataList) {
-        return new ArrayList<>();
+    protected float transDataToCrossDataFromDataList(int crossPointIndexInScreen, int dataInListIndex) {
+        return 0.000f;
     }
 
     /**
@@ -528,6 +527,13 @@ public class ViewContainer<T extends Object> {
         for (ViewContainer container : getChildrenList()) {
             container.setCalculateDataExtremum(isCalculateDataExtremum);
         }
+    }
+
+    /**
+     * 获得数据集合的长度
+     */
+    public int getDataListSize() {
+        return mDataList == null ? 0 : mDataList.size();
     }
 
     public ChartViewImp getChartView() {

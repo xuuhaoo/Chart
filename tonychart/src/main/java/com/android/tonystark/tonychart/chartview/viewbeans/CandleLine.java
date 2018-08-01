@@ -265,12 +265,13 @@ public class CandleLine extends AbsZoomMoveViewContainer<CandleLine.CandleLineBe
     }
 
     @Override
-    protected List<String> transDataToCrossDataFromDataList(List<CandleLineBean> originDataList) {
-        List<String> result = super.transDataToCrossDataFromDataList(originDataList);
-        for (CandleLineBean candleLineBean : originDataList) {
-            result.add(candleLineBean.getOpenPrice() + "");
+    protected float transDataToCrossDataFromDataList(int crossPointIndexInScreen, int dataInListIndex) {
+        if (dataInListIndex >= mDataList.size()) {
+            return super.transDataToCrossDataFromDataList(crossPointIndexInScreen, dataInListIndex);
         }
-        return result;
+
+        CandleLineBean bean = mDataList.get(dataInListIndex);
+        return bean.getClosePrice();
     }
 
     /**

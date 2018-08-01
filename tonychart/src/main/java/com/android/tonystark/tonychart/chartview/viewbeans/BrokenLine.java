@@ -308,9 +308,15 @@ public class BrokenLine extends AbsZoomMoveViewContainer<String> {
     }
 
     @Override
-    protected List<String> transDataToCrossDataFromDataList(List<String> originDataList) {
-        List<String> result = super.transDataToCrossDataFromDataList(originDataList);
-        result.addAll(originDataList);
-        return result;
+    protected float transDataToCrossDataFromDataList(int crossPointIndexInScreen, int dataInListIndex) {
+        if (dataInListIndex >= mDataList.size()) {
+            return super.transDataToCrossDataFromDataList(crossPointIndexInScreen, dataInListIndex);
+        }
+
+        try {
+            return Float.parseFloat(mDataList.get(dataInListIndex));
+        } catch (NumberFormatException e) {
+            return super.transDataToCrossDataFromDataList(crossPointIndexInScreen, dataInListIndex);
+        }
     }
 }
