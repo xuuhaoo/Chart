@@ -139,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter(mCandleLine));
 
 
-                IndicatorLine indicatorLine = getIndicatorLine();
-                mChartViewImp.addChild(indicatorLine);
+//                IndicatorLine indicatorLine = getIndicatorLine();
+//                mChartViewImp.addChild(indicatorLine);
 
                 //得到创建好的组件
                 Histogram histogram = getHistogram();
@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置主图十字线滑动监听器,this表示当前类实现了该接口
         crossLine.setOnCrossLineMoveListener(this);
         //设置纬线不跟数据
-//        crossLine.setLatitudeFollowData(false);
+        crossLine.setLatitudeFollowData(false);
     }
 
     private void initSubCrossLine() {
@@ -532,11 +532,23 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
     @Override
     public void onCrossLineMove(int index, int drawIndex, PointF pointF) {
-        Log.i("onCrossLineMove", "index:" + index + " drawIndex:" + drawIndex);
+        Log.i("onCrossLineMove", "index:" + index + " drawIndex:" + drawIndex + " xy:" + pointF.x + "," + pointF.y);
     }
 
     @Override
     public void onCrossLineDismiss() {
 
     }
+
+    @Override
+    public String onCrossIndicateYScale(int crossIndexInScreen, int drawPointIndex, int showPointNums) {
+        return 100 + "";
+    }
+
+    @Override
+    public String onCrossIndicateXScale(int crossIndexInScreen, int drawPointIndex, int showPointNums) {
+        return 200 + "";
+    }
+
+
 }

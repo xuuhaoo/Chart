@@ -32,9 +32,9 @@ public class IndicatorLine extends AbsZoomMoveViewContainer implements UnabelFoc
     //保留小数位
     private int mKeepNums = 3;
     //文字颜色
-    private int mTextColor = Color.BLACK;
+    private int mTextColor = Color.WHITE;
     //文字背景框
-    private int mTextBackgroundColor = Color.RED;
+    private int mTextBackgroundColor = Color.BLACK;
     //是否显示纬线
     private boolean isShowLatitude = true;
     //是否显示文字区域
