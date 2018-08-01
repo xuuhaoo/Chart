@@ -2,6 +2,7 @@ package com.android.didi.chart;
 
 import android.graphics.DashPathEffect;
 import android.graphics.PointF;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 
 import com.android.tonystark.tonychart.chartview.adapter.BrokenLineCoordinateAdapter;
 import com.android.tonystark.tonychart.chartview.adapter.CandleCoordinateAdapter;
+import com.android.tonystark.tonychart.chartview.viewbeans.AbsZoomMoveViewContainer;
 import com.android.tonystark.tonychart.chartview.viewbeans.BrokenLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
@@ -118,29 +120,27 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 //得到创建好的组件
                 mCandleLine = getCandleLine();
                 //添加组件到主图中
-                mChartViewImp.addChild(mCandleLine);
                 //因为当前主视图中有折线组建了,
                 //但我们希望,主图中坐标系和其他值都以K线为准,所以我们
                 //设置K线图为当前聚焦组件,设置聚焦组件后,坐标系的最大最小值都会以当前聚焦的K线组件的最大最小值为准,在此坐标系中的其他组件也会以他为准
                 //如果多个组件在一个视图中同时都调用了requestFocuse,将以最后一个调用者为当前focused的组件
                 mCandleLine.requestFocused();
                 mCandleLine.setExtremeCalculatorInterface(new MyExtremeCalculator(mChartViewImp));
+                mChartViewImp.addChild(mCandleLine);
+                mCandleLine.setOnMoveListener(new AbsZoomMoveViewContainer.OnMoveListener() {
+                    @Override
+                    public void onMove(ViewContainer viewContainer, int drawPointIndex, int currentShownNums, float yMax, float yMin) {
+                        Log.i("onMove", "drawPointIndex:" + drawPointIndex + " currentShownNums:" + currentShownNums + " yMax:" + yMax + " yMin:" + yMin);
+
+                    }
+                });
 
                 //设置主图的坐标系刻度适配器(因为当前聚焦的是K线图,所以坐标系需要展示K线的刻度适配器)
                 mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter(mCandleLine));
 
-                //指示器组件
-                IndicatorLine indicatorLine = new IndicatorLine(getApplicationContext(), new IndicatorLine.IndicatorLineDataParser<CandleLine.CandleLineBean>() {
-                    @Override
-                    public float indicateData(List<CandleLine.CandleLineBean> dataList, int drawPointIndex, int showPointNums, float yMax, float yMin) {
-                        CandleLine.CandleLineBean candleLine = dataList.get(drawPointIndex);
-                        return candleLine.getClosePrice();
-                    }
-                });
+
+                IndicatorLine indicatorLine = getIndicatorLine();
                 mChartViewImp.addChild(indicatorLine);
-                indicatorLine.setDataList(mKDataList);
-                indicatorLine.setDefaultShowPointNums(50);
-                indicatorLine.setDrawPointIndex(mKDataList.size() - indicatorLine.getDefaultShowPointNums());
 
                 //得到创建好的组件
                 Histogram histogram = getHistogram();
@@ -215,6 +215,23 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
         initMainView();
         initSubView();
+    }
+
+    @NonNull
+    private IndicatorLine getIndicatorLine() {
+        //指示器组件
+        IndicatorLine indicatorLine = new IndicatorLine(getApplicationContext(), new IndicatorLine.IndicatorLineDataParser<CandleLine.CandleLineBean>() {
+            @Override
+            public float indicateData(List<CandleLine.CandleLineBean> dataList, int drawPointIndex, int showPointNums, float yMax, float yMin) {
+                CandleLine.CandleLineBean candleLine = dataList.get(drawPointIndex);
+                return candleLine.getClosePrice();
+            }
+        });
+        indicatorLine.setLatitudeLineEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 1));
+        indicatorLine.setDataList(mKDataList);
+        indicatorLine.setDefaultShowPointNums(50);
+        indicatorLine.setDrawPointIndex(mKDataList.size() - indicatorLine.getDefaultShowPointNums());
+        return indicatorLine;
     }
 
     private void initMainCrossLine() {

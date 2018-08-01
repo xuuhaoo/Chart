@@ -122,7 +122,7 @@ public class AbsZoomMoveViewContainer<T> extends ViewContainer<T> {
     private void notifyZoomListener() {
         if (mZoomListener != null) {
             try {
-                mZoomListener.onZoom(this, mDefaultShowPointNums, mMinShownPointNums, mDrawPointIndex, mZoomCenterIndex, mYMax, mYMin);
+                mZoomListener.onZoom(this, mDefaultShowPointNums, mShownPointNums, mMinShownPointNums, mDrawPointIndex, mZoomCenterIndex, mYMax, mYMin);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -132,7 +132,7 @@ public class AbsZoomMoveViewContainer<T> extends ViewContainer<T> {
     private void notifyMoveListener() {
         if (mMoveListener != null) {
             try {
-                mMoveListener.onMove(this, mDrawPointIndex, mYMax, mYMin);
+                mMoveListener.onMove(this, mDrawPointIndex, mShownPointNums, mYMax, mYMin);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -239,11 +239,11 @@ public class AbsZoomMoveViewContainer<T> extends ViewContainer<T> {
     }
 
     public interface OnZoomListener {
-        void onZoom(ViewContainer viewContainer, int defaultShownNums, int minShownPointNums, int drawPointIndex, int zoomCenterPointIndex, float yMax, float yMin);
+        void onZoom(ViewContainer viewContainer, int defaultShownNums, int currentShownNums, int minShownPointNums, int drawPointIndex, int zoomCenterPointIndex, float yMax, float yMin);
     }
 
     public interface OnMoveListener {
-        void onMove(ViewContainer viewContainer, int drawPointIndex, float yMax, float yMin);
+        void onMove(ViewContainer viewContainer, int drawPointIndex, int currentShownNums, float yMax, float yMin);
     }
 
     public void setOnZoomListener(OnZoomListener zoomListener) {

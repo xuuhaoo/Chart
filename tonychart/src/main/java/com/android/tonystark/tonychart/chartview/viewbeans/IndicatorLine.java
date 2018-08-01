@@ -207,6 +207,21 @@ public class IndicatorLine extends AbsZoomMoveViewContainer implements UnabelFoc
         mTextBgPaint.setColor(textBackground);
     }
 
+    public void setPaddingHorizontalDP(float paddingHorizontalDP) {
+        mPaddingHorizontalDP = paddingHorizontalDP;
+    }
+
+    public void setPaddingVerticalDP(float paddingVerticalDP) {
+        mPaddingVerticalDP = paddingVerticalDP;
+    }
+
+    public void setCornerRoundRadius(float cornerRoundRadius) {
+        mCornerRoundRadius = cornerRoundRadius;
+    }
+
+    public void setTextSize(float sp) {
+        mTextPaint.setTextSize(getPixelSp(sp));
+    }
 
     public interface IndicatorLineDataParser<T extends Object> {
         /**
