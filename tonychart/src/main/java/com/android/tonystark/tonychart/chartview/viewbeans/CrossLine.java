@@ -7,13 +7,15 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 
+import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
+
 /**
  * 描述：十字线
  *
  * @author xuhao
  * @version 1.0
  */
-public class CrossLine extends ViewContainer<String> {
+public class CrossLine extends ViewContainer<String> implements UnabelFocusedsView {
     //线画笔
     private Paint mLinePaint = null;
     //点画笔
@@ -44,15 +46,6 @@ public class CrossLine extends ViewContainer<String> {
     private float mPointWidth = 0;
     //十字拖动监听器
     private OnCrossLineMoveListener mOnCrossLineMoveListener = null;
-
-    public CrossLine(Context context, float YMin, float YMax, int maxPointNums) {
-        super(context);
-        this.mYMin = YMin;
-        this.mYMax = YMax;
-        this.mShownPointNums = maxPointNums;
-        this.isShow = false;
-        initPaint();
-    }
 
     public CrossLine(Context context) {
         super(context);

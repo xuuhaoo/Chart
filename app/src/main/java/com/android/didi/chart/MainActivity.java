@@ -15,6 +15,7 @@ import com.android.tonystark.tonychart.chartview.viewbeans.BrokenLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.Histogram;
+import com.android.tonystark.tonychart.chartview.viewbeans.IndicatorLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.MACDHistogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.ViewContainer;
 import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
     private List<String> mPriceDataList;
     private LoopThread mThread;
     private CandleLine mCandleLine;
+    private BrokenLine mPriceLine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,13 +83,13 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 mChartSubViewImp.removeAllChildren();
 
                 //得到刚才创建好的组件
-                BrokenLine brokenLine = getBrokenLine();
+                mPriceLine = getBrokenLine();
                 //添加组件到主图中,因为当前主图中组件数量为空,所以第一个添加的组件默认为focused(聚焦)组件,不用显示的调用requestFocuse()函数.
                 //当然显示的调用也是没有问题的.
                 //显示调用如下:brokenLine.requestFocus();
-                mChartViewImp.addChild(brokenLine);
+                mChartViewImp.addChild(mPriceLine);
                 //设置主图的坐标系刻度适配器(因为当前聚焦的是折线图,所以坐标系需要展示折线的刻度适配器)
-                mChartViewImp.setCoordinateScaleAdapter(new BrokenLineCoordinateAdapter(brokenLine));
+                mChartViewImp.setCoordinateScaleAdapter(new BrokenLineCoordinateAdapter(mPriceLine));
                 //得到创建好的组件
                 MACDHistogram macdHistogram = getMACD();
                 //添加组件到副图中
@@ -109,9 +111,9 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
 
                 //得到刚才创建好的组件
-                BrokenLine brokenLine = getBrokenLine();
+                mPriceLine = getBrokenLine();
                 //添加组件到主图中
-                mChartViewImp.addChild(brokenLine);
+                mChartViewImp.addChild(mPriceLine);
 
                 //得到创建好的组件
                 mCandleLine = getCandleLine();
@@ -126,6 +128,19 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
                 //设置主图的坐标系刻度适配器(因为当前聚焦的是K线图,所以坐标系需要展示K线的刻度适配器)
                 mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter(mCandleLine));
+
+                //指示器组件
+                IndicatorLine indicatorLine = new IndicatorLine(getApplicationContext(), new IndicatorLine.IndicatorLineDataParser<CandleLine.CandleLineBean>() {
+                    @Override
+                    public float indicateData(List<CandleLine.CandleLineBean> dataList, int drawPointIndex, int showPointNums, float yMax, float yMin) {
+                        CandleLine.CandleLineBean candleLine = dataList.get(drawPointIndex);
+                        return candleLine.getClosePrice();
+                    }
+                });
+                mChartViewImp.addChild(indicatorLine);
+                indicatorLine.setDataList(mKDataList);
+                indicatorLine.setDefaultShowPointNums(50);
+                indicatorLine.setDrawPointIndex(mKDataList.size() - indicatorLine.getDefaultShowPointNums());
 
                 //得到创建好的组件
                 Histogram histogram = getHistogram();
@@ -160,26 +175,29 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                     mThread.shutdown();
                 } else {
                     mThread = new LoopThread(getApplicationContext()) {
-                        private float getRandom(CandleLine.CandleLineBean bean) {
+                        private float getRandom(float max, float min) {
                             Random random = new Random();
-                            float min = 1222.001f;
-                            float max = 1224.999f;
                             float generatedFloat = min + random.nextFloat() * (max - min);
                             return generatedFloat;
                         }
 
                         @Override
                         protected void runInLoopThread() throws Exception {
-                            if (mKDataList.isEmpty()) {
-                                return;
+                            if (mKDataList != null && !mKDataList.isEmpty()) {
+                                CandleLine.CandleLineBean bean = mKDataList.get(mKDataList.size() - 1);
+                                float random = getRandom(1222.001f, 1224.999f);
+                                Log.i("random close", "" + random);
+                                bean.setHeightPrice(random);
                             }
-                            CandleLine.CandleLineBean bean = mKDataList.get(mKDataList.size() - 1);
-                            float random = getRandom(bean);
-                            Log.i("random close", "" + random);
-                            bean.setHeightPrice(random);
+                            if (mPriceDataList != null && !mPriceDataList.isEmpty()) {
+                                mPriceDataList.remove(mPriceDataList.size() - 1);
+                                mPriceDataList.add(getRandom(1222.001f, 1224.999f) + "");
+                                mPriceLine.setDataList(mPriceDataList);
+                            }
+
                             mChartViewImp.notifyNeedForceSyncDataWithFocused();
                             mChartViewImp.postInvalidate();
-                            Thread.sleep(2000);
+                            Thread.sleep(1000);
                         }
 
                         @Override

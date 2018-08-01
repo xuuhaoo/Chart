@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 
 
 import com.android.tonystark.tonychart.R;
+import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
  * @author xuhao
  * @version 1.0
  */
-public class Coordinates extends ViewContainer<Object> {
+public class Coordinates extends ViewContainer<Object> implements UnabelFocusedsView {
     //左边文字画笔
     private Paint mLeftTextPaint = null;
     //右边文字画笔
@@ -188,7 +189,6 @@ public class Coordinates extends ViewContainer<Object> {
                 //画纬线
                 canvas.drawPath(path, mLatitudeLinePaint);
                 path.reset();
-//                canvas.drawLine(0, 0, mCoordinateWidth, 0, mLatitudeLinePaint);
                 //画纬线刻度(左)
                 canvas.drawText(leftScale, mSpace, leftScaleHeight + mSpace, mLeftTextPaint);
                 //画纬线刻度(右)
@@ -199,7 +199,6 @@ public class Coordinates extends ViewContainer<Object> {
                 //画纬线
                 canvas.drawPath(path, mLatitudeLinePaint);
                 path.reset();
-//                canvas.drawLine(0, mCoordinateHeight, mCoordinateWidth, mCoordinateHeight, mLatitudeLinePaint);
                 //画纬线刻度(左)
                 canvas.drawText(leftScale, mSpace, mCoordinateHeight - leftScaleHeight + mSpace, mLeftTextPaint);
                 //画纬线刻度(右)
@@ -211,7 +210,6 @@ public class Coordinates extends ViewContainer<Object> {
                 path.lineTo(mCoordinateWidth, tempLatitudeSpace);
                 canvas.drawPath(path, mLatitudeLinePaint);
                 path.reset();
-//                canvas.drawLine(0, tempLatitudeSpace, mCoordinateWidth, tempLatitudeSpace, mLatitudeLinePaint);
                 //画纬线刻度(左)
                 canvas.drawText(leftScale, mSpace, tempLatitudeSpace - leftScaleHeight + mSpace, mLeftTextPaint);
                 //画纬线刻度(右)

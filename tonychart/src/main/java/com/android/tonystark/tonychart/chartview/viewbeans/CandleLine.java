@@ -18,19 +18,14 @@ import java.util.List;
  * @author xuhao
  * @version 1.0
  */
-public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
-    //最小手指间距离
-    private static final int MIN_FINGER_DISTANCE = 10;
-    //最小移动距离
-    private static final int MIN_MOVE_DISTANCE = 5;
+public class CandleLine extends AbsZoomMoveViewContainer<CandleLine.CandleLineBean> {
+
     //极值指示线长度
     private static final int EXTREME_INDICATOR_LINE_WIDTH = 30;
     //蜡烛画笔
     private Paint mCandlePaint = null;
     //是否填充
     private boolean isFill = true;
-    //放大缩小中心蜡烛下标
-    private int mZoomCandleIndex = 0;
     //涨时颜色
     private int mUpColor = Color.parseColor("#ff322e");
     //跌时颜色
@@ -39,10 +34,6 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
     private int mEvenColor = Color.parseColor("#656565");
     //柱之间间隙
     private float mSpace = 0f;
-    //两指间间隙
-    private float mDistance = 0f;
-    //是否正在放大
-    private boolean isZooming = false;
     //蜡烛宽度
     private float mCandleWidth = 0;
     //画最大最小值的画笔
@@ -55,13 +46,6 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
     private boolean isNeedShowMaxPrice = false;
     //是否显示最小值
     private boolean isNeedShowMinPrice = false;
-
-    public CandleLine(Context context, float YMin, float YMax) {
-        super(context);
-        this.mYMin = YMin;
-        this.mYMax = YMax;
-        init();
-    }
 
     public CandleLine(Context context) {
         super(context);
@@ -225,193 +209,6 @@ public class CandleLine extends ViewContainer<CandleLine.CandleLineBean> {
         this.mUpColor = upColor;
         this.mDownColor = downColor;
         this.mEvenColor = evenColor;
-    }
-
-    @Override
-    public void zoom(MotionEvent event) {
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                isZooming = true;
-                mZoomCandleIndex = getZoomCenterCandleIndex(event);
-                mDistance = spacing(event);
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (event.getPointerCount() >= 2) {
-                    float spacing = spacing(event) - mDistance;
-                    int scale = (int) Math.abs(spacing) / 4;
-                    if (Math.abs(spacing) >= MIN_FINGER_DISTANCE) {
-                        mDistance = spacing(event);
-                        if (spacing < 0) {
-                            //缩小
-                            if (zoomOut(scale)) calculateDrawCandleIndex(event, scale, -1);//-1代表了缩小
-                        } else {
-                            //放大
-                            if (zoomIn(scale)) calculateDrawCandleIndex(event, scale, 1);//1代表了放大
-                        }
-                        //计算最大最小值
-                        calculateExtremeYPrivate();
-                    }
-                }
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-                break;
-            case MotionEvent.ACTION_UP:
-                //标志位复位放在这里是因为很用户双手离开屏幕时可能还会移动一下，会先触发ACTION_POINTER_UP,再触发ACTION_UP,
-                //这样就会导致复位后调用了move方法，导致视图移动
-                isZooming = false;
-                break;
-        }
-    }
-
-    /**
-     * 得到放大缩小的中心蜡烛下标
-     */
-    private int getZoomCenterCandleIndex(MotionEvent event) {
-        //计算放大中心
-        float pointLeft = event.getX(0) < event.getX(1) ? event.getX(0) : event.getX(1);
-        float pointRight = event.getX(0) > event.getX(1) ? event.getX(0) : event.getX(1);
-        int leftIndex = (int) ((pointLeft * mShownPointNums) / mCoordinateWidth);
-        int rightIndex = (int) ((pointRight * mShownPointNums) / mCoordinateWidth);
-        //得到两只之间的蜡烛相对于总显示根数的根数
-        int centerCandleNums = (rightIndex - leftIndex) / 2 + leftIndex;
-        return mDrawPointIndex + centerCandleNums;
-    }
-
-    /**
-     * 计算绘画蜡烛的起始值
-     */
-    private void calculateDrawCandleIndex(MotionEvent event, int scale, int zoomType) {
-        //计算左边应消失的根数,从而改变了右边消失的根数,因为总消失根数不变
-        int zoomCandleIndexTemp = getZoomCenterCandleIndex(event);
-
-        if (zoomType == 1) { //放大
-            if (zoomCandleIndexTemp - mZoomCandleIndex > 0) {
-                //目标左移,需要向右纠正,不改变绘图起始坐标,就会让图右移,因为显示条数在变少
-            } else if (zoomCandleIndexTemp - mZoomCandleIndex < 0) {
-                //目标右移,需要向左纠正
-                mDrawPointIndex = mDrawPointIndex + scale;
-            }
-        } else if (zoomType == -1) {//缩小
-            if (zoomCandleIndexTemp - mZoomCandleIndex > 0) {
-                //目标左移,需要向右纠正
-                mDrawPointIndex = mDrawPointIndex - scale;
-            } else if (zoomCandleIndexTemp - mZoomCandleIndex < 0) {
-                //目标右移,需要向左纠正,不改变绘图其实坐标,就会让图左移,因为显示条数增多
-            }
-        }
-        //越界判断
-        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums : mDrawPointIndex;
-        mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
-
-    }
-
-    /**
-     * 计算坐标极值
-     */
-    private void calculateExtremeYPrivate() {
-        if (isCalculateDataExtremum) {
-            float[] value = calculateExtremeY();
-            setMinDataValue(value[0]);
-            setMaxDataValue(value[1]);
-            mYMin = value[0];
-            mYMax = value[1];
-        }
-    }
-
-    /**
-     * 放大
-     *
-     * @return 表示是否进行了放大, true代表showPointNums进行了--;
-     */
-    private boolean zoomIn(int scale) {
-        if (mShownPointNums > mMinShownPointNums) {
-            //减少点数
-            mShownPointNums = mShownPointNums - scale;
-            mShownPointNums = mShownPointNums < mMinShownPointNums ? mMinShownPointNums : mShownPointNums;
-            Log.i("zoomIn", "mShownPointNums:" + mShownPointNums);
-            return true;
-        } else {
-            //此时显示的点数应该等于最小点数
-            mShownPointNums = mMinShownPointNums;
-            Log.i("zoomIn", "mShownPointNums:" + mShownPointNums);
-            return false;
-        }
-    }
-
-    /**
-     * 缩小
-     *
-     * @return 标识是否进行了缩小, true代表showPointNums进行了++;
-     */
-    private boolean zoomOut(int scale) {
-        if (mShownPointNums < mDefaultShowPointNums) {
-            //增加点根数
-            mShownPointNums = mShownPointNums + scale;
-            mShownPointNums = mShownPointNums > mDefaultShowPointNums ? mDefaultShowPointNums : mShownPointNums;
-            return true;
-        } else {
-            mShownPointNums = mDefaultShowPointNums;
-            return false;
-        }
-    }
-
-    /**
-     * 计算两指距离
-     */
-    private float spacing(MotionEvent event) {
-        float x = event.getX(0) - event.getX(1);
-        float y = event.getY(0) - event.getY(1);
-        return (float) Math.sqrt(x * x + y * y);
-    }
-
-    private PointF moveDownPointF = new PointF();
-
-
-    @Override
-    public void move(MotionEvent event) {
-        if (!isZooming) {//当不缩放的时候
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    moveDownPointF.x = event.getX();
-                    moveDownPointF.y = event.getY();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    float difX = moveDownPointF.x - event.getX();
-                    int scale = (int) Math.abs(difX) / 10;
-                    scale = scale < 1 ? 1 : scale;
-                    if (Math.abs(difX) >= MIN_MOVE_DISTANCE) {
-                        move(difX, scale);
-                        calculateExtremeYPrivate();
-                    }
-                    moveDownPointF.x = event.getX();
-                    moveDownPointF.y = event.getY();
-
-                    break;
-                case MotionEvent.ACTION_CANCEL:
-                case MotionEvent.ACTION_UP:
-                    break;
-            }
-        }
-    }
-
-    /**
-     * 移动
-     */
-    private void move(float difX, int scale) {
-        if (difX > 0) {//手指向左移动
-            if ((mDrawPointIndex + mShownPointNums) <= mDataList.size() - 1) {
-                mDrawPointIndex = mDrawPointIndex + scale;
-            }
-        } else if (difX < 0) {//手指向右移动
-            if (mDrawPointIndex > 0) {
-                mDrawPointIndex = mDrawPointIndex - scale;
-            }
-        }
-        //越界判断
-        mDrawPointIndex = mDrawPointIndex >= mDataList.size() - mShownPointNums ? mDataList.size() - mShownPointNums : mDrawPointIndex;
-        mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
     }
 
     @Override

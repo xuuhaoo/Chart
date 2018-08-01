@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
+import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
 import com.android.tonystark.tonychart.chartview.viewbeans.ChartView;
 import com.android.tonystark.tonychart.chartview.viewbeans.Coordinates;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
@@ -165,7 +166,7 @@ public class ChartViewImp extends View implements ChartView {
     public void requestFocusChild(ViewContainer vc) {
         for (ViewContainer temp : getChildren()) {
             if (temp.equals(vc)) {
-                if (!temp.equals(mFocusedView)) {
+                if (!temp.equals(mFocusedView) && !(temp instanceof UnabelFocusedsView)) {
                     mFocusHasChanged = true;
                     mFocusedView = temp;
                     invalidate();
@@ -346,6 +347,24 @@ public class ChartViewImp extends View implements ChartView {
         mCrossLine.setYMin(YMin);
     }
 
+    /**
+     * 设置默认显示数据数量
+     */
+    final public void setAllViewShowDefaultNums(int defaultNums) {
+        mViewContainer.setDefaultShowPointNums(defaultNums);
+        mCoordinates.setDefaultShowPointNums(defaultNums);
+        mCrossLine.setDefaultShowPointNums(defaultNums);
+    }
+
+    /**
+     * 设置开始绘制的数据下标数
+     */
+    final public void setAllViewDrawPointIndex(int index) {
+        mViewContainer.setDrawPointIndex(index);
+        mCoordinates.setDrawPointIndex(index);
+        mCrossLine.setDrawPointIndex(index);
+    }
+
     @Override
     final protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -402,8 +421,9 @@ public class ChartViewImp extends View implements ChartView {
                         createBufferPaintCanvas(getMeasuredWidth(), getMeasuredHeight());
                         clearCanvas(mSnapshotCanvas);
                         //绘画快照
-                        mCoordinates.draw(mSnapshotCanvas);
                         mViewContainer.draw(mSnapshotCanvas);
+                        mCoordinates.draw(mSnapshotCanvas);
+                        mViewContainer.drawAboveCoordinates(mSnapshotCanvas);
                         isSnapshotOpen = true;
                         invalidate();
                         return true;
@@ -413,8 +433,9 @@ public class ChartViewImp extends View implements ChartView {
                 createBufferPaintCanvas(getMeasuredWidth(), getMeasuredHeight());
                 clearCanvas(mSnapshotCanvas);
                 //绘画快照
-                mCoordinates.draw(mSnapshotCanvas);
                 mViewContainer.draw(mSnapshotCanvas);
+                mCoordinates.draw(mSnapshotCanvas);
+                mViewContainer.drawAboveCoordinates(mSnapshotCanvas);
                 isSnapshotOpen = true;
                 invalidate();
             }
@@ -449,8 +470,12 @@ public class ChartViewImp extends View implements ChartView {
             clearCanvas(canvas);
             //绘制背景色
             canvas.drawRect(mCoordinateRectF, mCoordinateBgPaint);
+            //绘制坐标系之下
             mViewContainer.draw(canvas);
+            //绘制坐标系
             mCoordinates.draw(canvas);
+            //绘制在坐标系之上
+            mViewContainer.drawAboveCoordinates(canvas);
         }
         if (mCrossLine != null) {
             mCrossLine.draw(canvas);

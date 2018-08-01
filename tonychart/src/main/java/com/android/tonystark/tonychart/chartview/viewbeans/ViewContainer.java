@@ -6,6 +6,8 @@ import android.support.annotation.CallSuper;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 
+import com.android.tonystark.tonychart.chartview.interfaces.AboveCoordinatesView;
+import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
 import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
 
 import java.util.ArrayList;
@@ -77,9 +79,25 @@ public class ViewContainer<T extends Object> {
         };
     }
 
+    /**
+     * 默认在坐标系之下绘制
+     */
     public void draw(Canvas canvas) {
         for (ViewContainer viewContainer : mChildrenList) {
-            viewContainer.draw(canvas);
+            if (!(viewContainer instanceof AboveCoordinatesView)) {
+                viewContainer.draw(canvas);
+            }
+        }
+    }
+
+    /**
+     * 绘制在坐标系之上
+     */
+    public final void drawAboveCoordinates(Canvas canvas) {
+        for (ViewContainer viewContainer : mChildrenList) {
+            if (viewContainer instanceof AboveCoordinatesView) {
+                viewContainer.draw(canvas);
+            }
         }
     }
 
@@ -271,6 +289,10 @@ public class ViewContainer<T extends Object> {
      */
     @CallSuper
     public void requestFocused() {
+        if (this instanceof UnabelFocusedsView) {
+            isRequestFocused = false;
+            return;
+        }
         if (mChartView != null) {
             mChartView.requestFocusChild(this);
         } else {

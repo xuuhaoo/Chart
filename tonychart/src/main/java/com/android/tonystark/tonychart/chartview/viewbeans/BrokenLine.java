@@ -22,9 +22,7 @@ import java.util.List;
  * @author xuhao
  * @version 1.0
  */
-public class BrokenLine extends ViewContainer<String> {
-    //最小手指间距离
-    private static final int MIN_FINGER_DISTANCE = 10;
+public class BrokenLine extends AbsZoomMoveViewContainer<String> {
     //最小移动距离
     private static final int MIN_MOVE_DISTANCE = 5;
     //线画笔
@@ -43,12 +41,6 @@ public class BrokenLine extends ViewContainer<String> {
     private int mStartColor = Color.WHITE;
     //渐变结束颜色
     private int mEndColor = Color.BLACK;
-    //是否正在缩放
-    private boolean isZooming = false;
-    //两指间距离
-    private float mDistance = 0f;
-    //缩放的中心点下标
-    private int mZoomPointIndex = 0;
     //背景元素路径
     private Path mBackgroundPath = null;
     //折线元素路径
@@ -63,22 +55,6 @@ public class BrokenLine extends ViewContainer<String> {
     private boolean mStartZero = false;
     //现在的线默认从每个点宽度的中间开始画，设置为true后最后一个点就画到末尾，不会留一点空白
     private boolean mEndFullView = false;
-
-    /**
-     * 折线
-     *
-     * @param YMax 坐标系中最大值
-     * @param YMin 坐标系中最小值
-     */
-    public BrokenLine(Context context, float YMax, float YMin) {
-        super(context);
-        this.mYMax = YMax;
-        this.mYMin = YMin;
-        //初始化线画笔
-        initPaint();
-        //初始化路径
-        initPath();
-    }
 
     public BrokenLine(Context context) {
         super(context);
@@ -209,188 +185,6 @@ public class BrokenLine extends ViewContainer<String> {
             pointF.set(x, y);
         }
         return pointF;
-    }
-
-    @Override
-    public void move(MotionEvent event) {
-        if (!isZooming) {//当不缩放的时候
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    mMoveDownPointF.x = event.getX();
-                    mMoveDownPointF.y = event.getY();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    float difX = mMoveDownPointF.x - event.getX();
-                    int scale = (int) Math.abs(difX) / 10;
-                    scale = scale < 1 ? 1 : scale;
-                    if (Math.abs(difX) >= MIN_MOVE_DISTANCE) {
-                        move(difX, scale);
-                        calculateExtremeYPrivate();
-                    }
-                    mMoveDownPointF.x = event.getX();
-                    mMoveDownPointF.y = event.getY();
-                    break;
-                case MotionEvent.ACTION_CANCEL:
-                case MotionEvent.ACTION_UP:
-                    break;
-            }
-        }
-    }
-
-    private PointF mMoveDownPointF = new PointF();
-
-    /**
-     * 移动
-     */
-    private void move(float difX, int scale) {
-        if (difX > 0) {//手指向左移动
-            if ((mDrawPointIndex + mShownPointNums) <= mDataList.size() - 1) {
-                mDrawPointIndex = mDrawPointIndex + scale;
-            }
-        } else if (difX < 0) {//手指向右移动
-            if (mDrawPointIndex > 0) {
-                mDrawPointIndex = mDrawPointIndex - scale;
-            }
-        }
-        //越界判断
-        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums : mDrawPointIndex;
-        mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
-    }
-
-    @Override
-    public void zoom(MotionEvent event) {
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                isZooming = true;
-                mZoomPointIndex = getZoomCenterPointIndex(event);
-                mDistance = spacing(event);
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (event.getPointerCount() >= 2) {
-                    float spacing = spacing(event) - mDistance;
-                    int scale = (int) Math.abs(spacing) / 4;
-                    if (Math.abs(spacing) >= MIN_FINGER_DISTANCE) {
-                        mDistance = spacing(event);
-                        if (spacing < 0) {
-                            //缩小
-                            if (zoomOut(scale)) calculateDrawPointIndex(event, scale, -1);//-1代表了缩小
-                        } else {
-                            //放大
-                            if (zoomIn(scale)) calculateDrawPointIndex(event, scale, 1);//1代表了放大
-                        }
-                        //计算最大最小值
-                        calculateExtremeYPrivate();
-                    }
-                }
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-                break;
-            case MotionEvent.ACTION_UP:
-                //标志位复位放在这里是因为很用户双手离开屏幕时可能还会移动一下，会先触发ACTION_POINTER_UP,再触发ACTION_UP,
-                //这样就会导致复位后调用了move方法，导致视图移动
-                isZooming = false;
-                break;
-        }
-    }
-
-    /**
-     * 计算坐标极值
-     */
-    private void calculateExtremeYPrivate() {
-        if (isCalculateDataExtremum) {
-            float[] value = calculateExtremeY();
-            mYMin = value[0];
-            mYMax = value[1];
-        }
-    }
-
-
-    /**
-     * 放大
-     *
-     * @return 表示是否进行了放大, true代表showPointNums进行了--;
-     */
-    private boolean zoomIn(int scale) {
-        if (mShownPointNums > mMinShownPointNums) {
-            //减少点数
-            mShownPointNums = mShownPointNums - scale;
-            mShownPointNums = mShownPointNums < mMinShownPointNums ? mMinShownPointNums : mShownPointNums;
-            return true;
-        } else {
-            //此时显示的点数应该等于最小点数
-            mShownPointNums = mMinShownPointNums;
-            return false;
-        }
-    }
-
-    /**
-     * 缩小
-     *
-     * @return 标识是否进行了缩小, true代表showPointNums进行了++;
-     */
-    private boolean zoomOut(int scale) {
-        if (mShownPointNums < mDefaultShowPointNums) {
-            //增加点根数
-            mShownPointNums = mShownPointNums + scale;
-            mShownPointNums = mShownPointNums > mDefaultShowPointNums ? mDefaultShowPointNums : mShownPointNums;
-            return true;
-        } else {
-            mShownPointNums = mDefaultShowPointNums;
-            return false;
-        }
-    }
-
-    /**
-     * 计算两指距离
-     */
-    private float spacing(MotionEvent event) {
-        float x = event.getX(0) - event.getX(1);
-        float y = event.getY(0) - event.getY(1);
-        return (float) Math.sqrt(x * x + y * y);
-    }
-
-    /**
-     * 得到放大缩小的中心点下标
-     */
-    private int getZoomCenterPointIndex(MotionEvent event) {
-        //计算放大中心
-        float pointLeft = event.getX(0) < event.getX(1) ? event.getX(0) : event.getX(1);
-        float pointRight = event.getX(0) > event.getX(1) ? event.getX(0) : event.getX(1);
-        int leftIndex = (int) ((pointLeft * mShownPointNums) / mCoordinateWidth);
-        int rightIndex = (int) ((pointRight * mShownPointNums) / mCoordinateWidth);
-        //得到两只之间的点相对于总显示根数的根数
-        int centerPointNums = (rightIndex - leftIndex) / 2 + leftIndex;
-        return mDrawPointIndex + centerPointNums;
-    }
-
-    /**
-     * 计算绘画点的起始值
-     */
-    private void calculateDrawPointIndex(MotionEvent event, int scale, int zoomType) {
-        //计算左边应消失的根数,从而改变了右边消失的根数,因为总消失根数不变
-        int zoomPointIndexTemp = getZoomCenterPointIndex(event);
-
-        if (zoomType == 1) { //放大
-            if (zoomPointIndexTemp - mZoomPointIndex > 0) {
-                //目标左移,需要向右纠正,不改变绘图起始坐标,就会让图右移,因为显示条数在变少
-            } else if (zoomPointIndexTemp - mZoomPointIndex < 0) {
-                //目标右移,需要向左纠正
-                mDrawPointIndex = mDrawPointIndex + scale;
-            }
-        } else if (zoomType == -1) {//缩小
-            if (zoomPointIndexTemp - mZoomPointIndex > 0) {
-                //目标左移,需要向右纠正
-                mDrawPointIndex = mDrawPointIndex - scale;
-            } else if (zoomPointIndexTemp - mZoomPointIndex < 0) {
-                //目标右移,需要向左纠正,不改变绘图其实坐标,就会让图左移,因为现实条数增多
-            }
-        }
-        //越界判断
-        mDrawPointIndex = mDrawPointIndex + mShownPointNums >= mDataList.size() ? mDataList.size() - mShownPointNums : mDrawPointIndex;
-        mDrawPointIndex = mDrawPointIndex < 0 ? 0 : mDrawPointIndex;
-
     }
 
     public void setCoordinateHeight(float coordinateHeight) {
