@@ -128,6 +128,14 @@ public class ChartViewImp extends View implements ChartView {
      */
     @Override
     final public void addChild(ViewContainer vc) {
+        if (vc == null) {
+            return;
+        }
+
+        if (vc.getChartView() != null) {
+            throw new IllegalStateException(vc.getClass().getSimpleName() + " is already attach the ChartView,you can't attach it again! please remove it from ChartView first");
+        }
+
         mViewContainer.addChildren(vc);
 
         vc.setChartView(this);
@@ -229,19 +237,9 @@ public class ChartViewImp extends View implements ChartView {
                 removeFocused();
             }
             mViewContainer.removeChildren(vc);
+            vc.setChartView(null);
             invalidate();
         }
-    }
-
-    /**
-     * 返回聚焦的View
-     *
-     * @return
-     */
-    @Override
-    @Nullable
-    public ViewContainer getFocusedView() {
-        return mFocusedView;
     }
 
     /**
@@ -254,10 +252,22 @@ public class ChartViewImp extends View implements ChartView {
             ViewContainer view = it.next();
             if (!(view instanceof Coordinates) && !(view instanceof CrossLine)) {
                 it.remove();
+                view.setChartView(null);
             }
         }
         removeFocused();
         invalidate();
+    }
+
+    /**
+     * 返回聚焦的View
+     *
+     * @return
+     */
+    @Override
+    @Nullable
+    public ViewContainer getFocusedView() {
+        return mFocusedView;
     }
 
     private void removeFocused() {

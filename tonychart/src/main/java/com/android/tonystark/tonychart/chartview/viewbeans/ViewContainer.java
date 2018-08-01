@@ -530,6 +530,10 @@ public class ViewContainer<T extends Object> {
         }
     }
 
+    public ChartViewImp getChartView() {
+        return mChartView;
+    }
+
     public interface ExtremeCalculatorInterface {
         float onCalculateMax(int drawPointIndex, int showPointNums);
 

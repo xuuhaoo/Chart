@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -43,9 +44,9 @@ public class IndicatorLine extends AbsZoomMoveViewContainer implements UnabelFoc
     //数据指示器数据解析
     private IndicatorLineDataParser mIndicatorLineDataParser;
     //横向的padding
-    private float mPaddingHorizontalDP = 0;
+    private float mPaddingHorizontalDP = 2;
     //纵向的padding
-    private float mPaddingVerticalDP = 1;
+    private float mPaddingVerticalDP = 2;
     //圆角半径
     private float mCornerRoundRadius = 4;
     //当前坐标点,仅Y轴即可,X轴数据为0
@@ -67,14 +68,15 @@ public class IndicatorLine extends AbsZoomMoveViewContainer implements UnabelFoc
     private void init() {
         mLinePaint = new Paint();
         mLinePaint.setColor(mLineColor);
-        mLinePaint.setStyle(Paint.Style.FILL);
+        mLinePaint.setStyle(Paint.Style.STROKE);
         mLinePaint.setAntiAlias(true);
+        mLinePaint.setStrokeWidth(getPixelDp(1));
 
         mTextPaint = new Paint();
         mTextPaint.setColor(mTextColor);
         mTextPaint.setStyle(Paint.Style.FILL);
         mTextPaint.setAntiAlias(true);
-        mTextPaint.setTextSize(getPixelSp(9));
+        mTextPaint.setTextSize(getPixelSp(8));
         mTextPaint.setTextAlign(Paint.Align.LEFT);
 
         mTextBgPaint = new Paint();
@@ -121,7 +123,10 @@ public class IndicatorLine extends AbsZoomMoveViewContainer implements UnabelFoc
      */
     private void drawLatitude(Canvas canvas, float valueWhichNeedIndicated) {
         mPointF.y = (1f - (valueWhichNeedIndicated - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
-        canvas.drawLine(mCoordinateMarginLeft, mPointF.y, mCoordinateWidth, mPointF.y, mLinePaint);
+        Path path = new Path();
+        path.moveTo(mLinePaint.getStrokeWidth() + mCoordinateMarginLeft, mPointF.y);
+        path.lineTo(mLinePaint.getStrokeWidth() + mCoordinateWidth, mPointF.y);
+        canvas.drawPath(path, mLinePaint);
     }
 
     /**
@@ -151,7 +156,7 @@ public class IndicatorLine extends AbsZoomMoveViewContainer implements UnabelFoc
             canvas.drawRoundRect(roundBg, mCornerRoundRadius, mCornerRoundRadius, mTextBgPaint);
         }
         //绘制文字
-        canvas.drawText(str, roundBg.left + getPixelDp(mPaddingHorizontalDP), roundBg.top + getPixelDp(mPaddingVerticalDP) + height, mTextPaint);
+        canvas.drawText(str, roundBg.left + getPixelDp(mPaddingHorizontalDP), roundBg.top + getPixelDp(mPaddingVerticalDP) / 2 + height, mTextPaint);
     }
 
     private void checkParameter() {
@@ -221,6 +226,10 @@ public class IndicatorLine extends AbsZoomMoveViewContainer implements UnabelFoc
 
     public void setTextSize(float sp) {
         mTextPaint.setTextSize(getPixelSp(sp));
+    }
+
+    public void setLineWidth(float dp) {
+        mLinePaint.setStrokeWidth(getPixelDp(dp));
     }
 
     public interface IndicatorLineDataParser<T extends Object> {
