@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 
 
 import com.android.tonystark.tonychart.R;
@@ -126,6 +127,9 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
             if (mCoordinateScaleAdapter != null) {
                 bottomScale = mCoordinateScaleAdapter.getXBottomScaleString(mDataList, mDrawPointIndex, mShownPointNums, i, mLongitudeNums);
             }
+            if (TextUtils.isEmpty(bottomScale)) {
+                continue;
+            }
             float scaleWidth = mBottomTextPaint.measureText(bottomScale);//文字宽度
             mBottomTextPaint.getFontMetrics(fm);
             float scaleHeight = Math.abs(fm.ascent);//文字高度
@@ -172,6 +176,9 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
             if (mCoordinateScaleAdapter != null) {
                 leftScale = mCoordinateScaleAdapter.getYLeftScaleString(mDataList, mDrawPointIndex, mShownPointNums, i, mLatitudeNums);
             }
+            if (leftScale == null) {
+                leftScale = "";
+            }
             float leftScaleWidth = mLeftTextPaint.measureText(leftScale);//左边文字宽度
             mLeftTextPaint.getFontMetrics(fm);
             float leftScaleHeight = Math.abs(fm.ascent);//左边文字高度
@@ -179,6 +186,9 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
             String rightScale = "";//右边刻度文字
             if (mCoordinateScaleAdapter != null) {
                 rightScale = mCoordinateScaleAdapter.getYRightScaleString(mDataList, mDrawPointIndex, mShownPointNums, i, mLatitudeNums);
+            }
+            if (rightScale == null) {
+                rightScale = "";
             }
             float rightScaleWidth = mRightTextPaint.measureText(rightScale);//右边文字宽度
             mRightTextPaint.getFontMetrics(fm);
@@ -190,19 +200,27 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
                 canvas.drawPath(path, mLatitudeLinePaint);
                 path.reset();
                 //画纬线刻度(左)
-                canvas.drawText(leftScale, mSpace, leftScaleHeight + mSpace, mLeftTextPaint);
-                //画纬线刻度(右)
-                canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mSpace, leftScaleHeight + mSpace, mRightTextPaint);
+                if (!TextUtils.isEmpty(leftScale)) {
+                    canvas.drawText(leftScale, mSpace, leftScaleHeight + mSpace, mLeftTextPaint);
+                }
+                if (!TextUtils.isEmpty(rightScale)) {
+                    //画纬线刻度(右)
+                    canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mSpace, leftScaleHeight + mSpace, mRightTextPaint);
+                }
             } else if (i == mLatitudeNums - 1) {//最后一条纬线
                 path.moveTo(mCoordinateMarginLeft, mCoordinateHeight - 1); //减去1是因为不减就看不到这条线了
                 path.lineTo(mCoordinateWidth, mCoordinateHeight - 1); //减去1是因为不减就看不到这条线了
                 //画纬线
                 canvas.drawPath(path, mLatitudeLinePaint);
                 path.reset();
-                //画纬线刻度(左)
-                canvas.drawText(leftScale, mSpace, mCoordinateHeight - leftScaleHeight + mSpace, mLeftTextPaint);
-                //画纬线刻度(右)
-                canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mSpace, mCoordinateHeight - rightScaleHeight + mSpace, mRightTextPaint);
+                if (!TextUtils.isEmpty(leftScale)) {
+                    //画纬线刻度(左)
+                    canvas.drawText(leftScale, mSpace, mCoordinateHeight - leftScaleHeight + mSpace, mLeftTextPaint);
+                }
+                if (!TextUtils.isEmpty(rightScale)) {
+                    //画纬线刻度(右)
+                    canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mSpace, mCoordinateHeight - rightScaleHeight + mSpace, mRightTextPaint);
+                }
             } else {//中间的纬线
                 //画纬线
                 float tempLatitudeSpace = i * latitudeSpace;//纬线间隙,i此时应从1开始,因为第一个if屏蔽了0
@@ -210,10 +228,14 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
                 path.lineTo(mCoordinateWidth, tempLatitudeSpace);
                 canvas.drawPath(path, mLatitudeLinePaint);
                 path.reset();
-                //画纬线刻度(左)
-                canvas.drawText(leftScale, mSpace, tempLatitudeSpace - leftScaleHeight + mSpace, mLeftTextPaint);
-                //画纬线刻度(右)
-                canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mSpace, tempLatitudeSpace - rightScaleHeight + mSpace, mRightTextPaint);
+                if (!TextUtils.isEmpty(leftScale)) {
+                    //画纬线刻度(左)
+                    canvas.drawText(leftScale, mSpace, tempLatitudeSpace - leftScaleHeight + mSpace, mLeftTextPaint);
+                }
+                if (!TextUtils.isEmpty(rightScale)) {
+                    //画纬线刻度(右)
+                    canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mSpace, tempLatitudeSpace - rightScaleHeight + mSpace, mRightTextPaint);
+                }
             }
         }
     }

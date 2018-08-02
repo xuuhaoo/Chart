@@ -194,8 +194,7 @@ public class IndicatorLine extends AbsZoomMoveViewContainer implements UnabelFoc
      * 设置线的样式
      */
     public void setLatitudeLineEffect(PathEffect pathEffect) {
-        //TODO 日后付费修复
-//        mLinePaint.setPathEffect(pathEffect);
+        mLinePaint.setPathEffect(pathEffect);
     }
 
     public void setLineColor(int lineColor) {

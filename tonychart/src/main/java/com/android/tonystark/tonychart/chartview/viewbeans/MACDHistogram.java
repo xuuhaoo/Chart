@@ -208,8 +208,7 @@ public class MACDHistogram extends AbsZoomMoveViewContainer<MACDHistogram.MACDBe
     }
 
     public void setFill(boolean isFill) {
-        //TODO 日后付费修复
-//        this.isFill = isFill;
+        this.isFill = isFill;
     }
 
     public boolean isCalculateDataExtraNum() {

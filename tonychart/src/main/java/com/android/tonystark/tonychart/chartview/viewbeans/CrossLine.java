@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 
 import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
@@ -246,7 +247,9 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
         }
         mCrossPointF.y = y;
         String indicateValue = mOnCrossLineMoveListener.onCrossIndicateYScale(index, mDrawPointIndex, mShownPointNums);
-
+        if (TextUtils.isEmpty(indicateValue)) {
+            return;
+        }
         //文字高度
         float height = getTextHeight();
         //计算背景宽高
@@ -283,6 +286,9 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
         }
         mCrossPointF.x = x;
         String indicateValue = mOnCrossLineMoveListener.onCrossIndicateXScale(index, mDrawPointIndex, mShownPointNums);
+        if (TextUtils.isEmpty(indicateValue)) {
+            return;
+        }
         //文字高度
         float height = getTextHeight();
         //计算背景宽高

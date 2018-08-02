@@ -24,4 +24,6 @@ dependencies {
 
     implementation project(':tonychart')
     implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.tonystark.android:socket:2.0.4'
+
 }

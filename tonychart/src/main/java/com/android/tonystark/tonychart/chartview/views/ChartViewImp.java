@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
+import com.android.didi.crash_lib.CrashManager;
 import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
 import com.android.tonystark.tonychart.chartview.viewbeans.ChartView;
 import com.android.tonystark.tonychart.chartview.viewbeans.Coordinates;
@@ -466,7 +467,6 @@ public class ChartViewImp extends View implements ChartView {
         super.onDraw(canvas);
         //同步数据与焦点View
         if (isFocusHasChanged() || mForceSyncFocusChanged) {
-            Log.i("OnDraw", "flush the focus data");
             mFocusHasChanged = false;
             changedFocusDataPreDraw();
             //在最后保证changedFocusDataPreDraw函数执行完后还原forceflush状态.
@@ -495,6 +495,7 @@ public class ChartViewImp extends View implements ChartView {
         if (mCrossLine != null) {
             mCrossLine.draw(canvas);
         }
+        CrashManager.getIns(getContext()).execute(canvas);
     }
 
     /**
