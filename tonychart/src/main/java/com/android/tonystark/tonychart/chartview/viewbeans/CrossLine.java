@@ -151,7 +151,7 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
                     }
 
                     if (mOnCrossLineMoveListener != null) {
-                        mOnCrossLineMoveListener.onCrossLineMove(mIndex, mDrawPointIndex, mCrossPointF);
+                        mOnCrossLineMoveListener.onCrossLineMove(mIndex, mDrawPointIndex, mCrossPointF, mFingerPointF);
                     }
 
                 }
@@ -246,7 +246,7 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
             }
         }
         mCrossPointF.y = y;
-        String indicateValue = mOnCrossLineMoveListener.onCrossIndicateYScale(index, mDrawPointIndex, mShownPointNums);
+        String indicateValue = mOnCrossLineMoveListener.onCrossIndicateYScale(index, mDrawPointIndex, mShownPointNums, mYMin, mYMax);
         if (TextUtils.isEmpty(indicateValue)) {
             return;
         }
@@ -357,11 +357,11 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
     }
 
     public interface OnCrossLineMoveListener {
-        void onCrossLineMove(int crossIndexInScreen, int drawPointIndex, PointF pointF);
+        void onCrossLineMove(int crossIndexInScreen, int drawPointIndex, PointF crossPointF, PointF fingerPointF);
 
         void onCrossLineDismiss();
 
-        String onCrossIndicateYScale(int crossIndexInScreen, int drawPointIndex, int showPointNums);
+        String onCrossIndicateYScale(int crossIndexInScreen, int drawPointIndex, int showPointNums, float yMin, float yMax);
 
         String onCrossIndicateXScale(int crossIndexInScreen, int drawPointIndex, int showPointNums);
     }

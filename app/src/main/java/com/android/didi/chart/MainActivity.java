@@ -139,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter(mCandleLine));
 
 
-//                IndicatorLine indicatorLine = getIndicatorLine();
-//                mChartViewImp.addChild(indicatorLine);
+                IndicatorLine indicatorLine = getIndicatorLine();
+                mChartViewImp.addChild(indicatorLine);
 
                 //得到创建好的组件
                 Histogram histogram = getHistogram();
@@ -529,10 +529,9 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         return result;
     }
 
-
     @Override
-    public void onCrossLineMove(int index, int drawIndex, PointF pointF) {
-        Log.i("onCrossLineMove", "index:" + index + " drawIndex:" + drawIndex + " xy:" + pointF.x + "," + pointF.y);
+    public void onCrossLineMove(int crossIndexInScreen, int drawPointIndex, PointF crossPointF, PointF fingerPointF) {
+
     }
 
     @Override
@@ -541,8 +540,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
     }
 
     @Override
-    public String onCrossIndicateYScale(int crossIndexInScreen, int drawPointIndex, int showPointNums) {
-        return 100 + "";
+    public String onCrossIndicateYScale(int crossIndexInScreen, int drawPointIndex, int showPointNums, float yMin, float yMax) {
+        return 300 + "";
     }
 
     @Override
