@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -314,7 +313,7 @@ public class ChartViewImp extends View implements ChartView {
      */
     private void setDrawRect(ViewContainer vc, int width, int height) {
         if (isHasBottomBlack && mCoordinates != null) {
-            height = height - mCoordinates.getMarginBottom();//为底部留出空隙
+            height = height - mCoordinates.getFixedSpaceWithBottom();//为底部留出空隙
         }
 
         mCoordinateRectF.top = 0;
@@ -791,6 +790,15 @@ public class ChartViewImp extends View implements ChartView {
     }
 
     /**
+     * 设置坐标系文字居中模式
+     */
+    public void setCoordinateTextGravity(Coordinates.TextGravity textGravity) {
+        if (mCoordinates != null) {
+            mCoordinates.setLatitudeTextGravity(textGravity);
+        }
+    }
+
+    /**
      * 设置坐标系数据w3
      */
     public void setCoordinateDataList(List dataList) {
@@ -818,6 +826,13 @@ public class ChartViewImp extends View implements ChartView {
      */
     public CrossLine getCrossLine() {
         return mCrossLine;
+    }
+
+    /**
+     * 获取坐标系
+     */
+    public Coordinates getCoordinates() {
+        return mCoordinates;
     }
 
     /**

@@ -39,9 +39,13 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
     //坐标系刻度适配器
     private CoordinateScaleAdapter mCoordinateScaleAdapter = null;
     //距边距的空隙值
-    private float mSpace = 0;
+    private float mFixedSpaceWithLeft = 0;
+    //固定间隙与纬线之间的
+    private float mFixedSpaceWithLatitudeLine = 0;
     //坐标系底部空余
-    private int mMarginBottom = 0;
+    private int mFixedSpaceWithBottom = 0;
+    //刻度所在的位置相对于纬线
+    private TextGravity mLatitudeTextGravity = TextGravity.ABOVE_LINE;
 
     /**
      * 坐标系
@@ -63,7 +67,6 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
         super(context);
         //初始化画笔
         initPaint();
-        mMarginBottom = (int) getPixelDp(15);
     }
 
     /**
@@ -95,8 +98,12 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
         mBottomTextPaint.setTextSize(getPixelSp(9));
         mBottomTextPaint.setAntiAlias(true);
         mBottomTextPaint.setColor(ContextCompat.getColor(mContext, R.color.tiny_gray));
-        //初始化空隙,该空隙用于文字与边距和纬线之间的距离
-        mSpace = getPixelSp(2);
+        //初始化空隙,该空隙用于文字与左边的距离
+        mFixedSpaceWithLeft = getPixelSp(2);
+        //初始化间隙,该间隙用于文字与纬线之间的距离
+        mFixedSpaceWithLatitudeLine = (int) getPixelDp(2);
+        //初始化间隙,该间隙用于坐标系底部的距离
+        mFixedSpaceWithBottom = (int) getPixelDp(15);
     }
 
     @Override
@@ -139,18 +146,16 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
                 path.lineTo(mLongitudeLinePaint.getStrokeWidth() + mCoordinateMarginLeft, mCoordinateHeight);
                 canvas.drawPath(path, mLongitudeLinePaint);
                 path.reset();
-//                canvas.drawLine(mLongitudeLinePaint.getStrokeWidth(), 0, mLongitudeLinePaint.getStrokeWidth(), mCoordinateHeight, mLongitudeLinePaint);
                 //画经线刻度
-                canvas.drawText(bottomScale, mSpace + mCoordinateMarginLeft, mCoordinateHeight + mMarginBottom / 2 + scaleHeight / 2, mBottomTextPaint);
+                canvas.drawText(bottomScale, mFixedSpaceWithLeft + mCoordinateMarginLeft, mCoordinateHeight + mFixedSpaceWithBottom / 2 + scaleHeight / 2, mBottomTextPaint);
             } else if (i == mLongitudeNums - 1) {//最后一条经线
                 //画经线
                 path.moveTo(mCoordinateWidth - mLongitudeLinePaint.getStrokeWidth(), 0);
                 path.lineTo(mCoordinateWidth - mLongitudeLinePaint.getStrokeWidth(), mCoordinateHeight);
                 canvas.drawPath(path, mLongitudeLinePaint);
                 path.reset();
-//                canvas.drawLine(mCoordinateWidth - mLongitudeLinePaint.getStrokeWidth(), 0, mCoordinateWidth - mLongitudeLinePaint.getStrokeWidth(), mCoordinateHeight, mLongitudeLinePaint);
                 //画经线刻度
-                canvas.drawText(bottomScale, mCoordinateWidth - scaleWidth - mSpace, mCoordinateHeight + mMarginBottom / 2 + scaleHeight / 2, mBottomTextPaint);
+                canvas.drawText(bottomScale, mCoordinateWidth - scaleWidth - mFixedSpaceWithLeft, mCoordinateHeight + mFixedSpaceWithBottom / 2 + scaleHeight / 2, mBottomTextPaint);
             } else {//其中所有的经线
                 //画经线
                 float tempLongitudeSpace = i * longitudeSpace + mCoordinateMarginLeft;//经线间隙,i此时应从1开始,因为第一个if屏蔽了0
@@ -158,9 +163,8 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
                 path.lineTo(tempLongitudeSpace - mLongitudeLinePaint.getStrokeWidth(), mCoordinateHeight);
                 canvas.drawPath(path, mLongitudeLinePaint);
                 path.reset();
-//                canvas.drawLine(tempLongitudeSpace - mLongitudeLinePaint.getStrokeWidth(), 0, tempLongitudeSpace - mLongitudeLinePaint.getStrokeWidth(), mCoordinateHeight, mLongitudeLinePaint);
                 //画经线刻度
-                canvas.drawText(bottomScale, tempLongitudeSpace - scaleWidth / 2, mCoordinateHeight + mMarginBottom / 2 + scaleHeight / 2, mBottomTextPaint);
+                canvas.drawText(bottomScale, tempLongitudeSpace - scaleWidth / 2, mCoordinateHeight + mFixedSpaceWithBottom / 2 + scaleHeight / 2, mBottomTextPaint);
             }
         }
     }
@@ -193,6 +197,8 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
             float rightScaleWidth = mRightTextPaint.measureText(rightScale);//右边文字宽度
             mRightTextPaint.getFontMetrics(fm);
             float rightScaleHeight = Math.abs(fm.ascent);//右边文字高度
+
+
             if (i == 0) {//第一条纬线
                 path.moveTo(mCoordinateMarginLeft, 0);
                 path.lineTo(mCoordinateWidth, 0);
@@ -200,12 +206,18 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
                 canvas.drawPath(path, mLatitudeLinePaint);
                 path.reset();
                 //画纬线刻度(左)
+                TextGravity textGravity = mLatitudeTextGravity;
+                if (textGravity == TextGravity.ABOVE_LINE || textGravity == TextGravity.VERTICAL_CENTER_LINE) {//如果第一条纬线的刻度是在纬线之上或者之中,我们就将其设置为线之下模式,因为线之之中上显示不下
+                    textGravity = TextGravity.BLEW_LINE;
+                }
                 if (!TextUtils.isEmpty(leftScale)) {
-                    canvas.drawText(leftScale, mSpace, leftScaleHeight + mSpace, mLeftTextPaint);
+                    float verticalOffset = getTextVerticalOffsetByGravity(textGravity, leftScaleHeight);
+                    canvas.drawText(leftScale, mFixedSpaceWithLeft, verticalOffset, mLeftTextPaint);
                 }
                 if (!TextUtils.isEmpty(rightScale)) {
+                    float verticalOffset = getTextVerticalOffsetByGravity(textGravity, rightScaleHeight);
                     //画纬线刻度(右)
-                    canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mSpace, leftScaleHeight + mSpace, mRightTextPaint);
+                    canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mFixedSpaceWithLeft, verticalOffset, mRightTextPaint);
                 }
             } else if (i == mLatitudeNums - 1) {//最后一条纬线
                 path.moveTo(mCoordinateMarginLeft, mCoordinateHeight - 1); //减去1是因为不减就看不到这条线了
@@ -213,13 +225,23 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
                 //画纬线
                 canvas.drawPath(path, mLatitudeLinePaint);
                 path.reset();
+
+                TextGravity textGravity = mLatitudeTextGravity;
+                if (textGravity == TextGravity.BLEW_LINE || textGravity == TextGravity.VERTICAL_CENTER_LINE) {
+//                    if (mFixedSpaceWithBottom <= 0) {//如果第一条纬线的刻度是在纬线之下,我们就将其设置为最接近的线之上模式,因为线之下显示不了
+                    textGravity = TextGravity.ABOVE_LINE;
+//                    }
+                }
+
                 if (!TextUtils.isEmpty(leftScale)) {
+                    float verticalOffset = getTextVerticalOffsetByGravity(textGravity, leftScaleHeight);
                     //画纬线刻度(左)
-                    canvas.drawText(leftScale, mSpace, mCoordinateHeight - leftScaleHeight + mSpace, mLeftTextPaint);
+                    canvas.drawText(leftScale, mFixedSpaceWithLeft, mCoordinateHeight + verticalOffset, mLeftTextPaint);
                 }
                 if (!TextUtils.isEmpty(rightScale)) {
+                    float verticalOffset = getTextVerticalOffsetByGravity(textGravity, rightScaleHeight);
                     //画纬线刻度(右)
-                    canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mSpace, mCoordinateHeight - rightScaleHeight + mSpace, mRightTextPaint);
+                    canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mFixedSpaceWithLeft, mCoordinateHeight + verticalOffset, mRightTextPaint);
                 }
             } else {//中间的纬线
                 //画纬线
@@ -228,16 +250,34 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
                 path.lineTo(mCoordinateWidth, tempLatitudeSpace);
                 canvas.drawPath(path, mLatitudeLinePaint);
                 path.reset();
+
                 if (!TextUtils.isEmpty(leftScale)) {
+                    float verticalOffset = getTextVerticalOffsetByGravity(mLatitudeTextGravity, leftScaleHeight);
                     //画纬线刻度(左)
-                    canvas.drawText(leftScale, mSpace, tempLatitudeSpace - leftScaleHeight + mSpace, mLeftTextPaint);
+                    canvas.drawText(leftScale, mFixedSpaceWithLeft, tempLatitudeSpace + verticalOffset, mLeftTextPaint);
                 }
                 if (!TextUtils.isEmpty(rightScale)) {
+                    float verticalOffset = getTextVerticalOffsetByGravity(mLatitudeTextGravity, rightScaleHeight);
                     //画纬线刻度(右)
-                    canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mSpace, tempLatitudeSpace - rightScaleHeight + mSpace, mRightTextPaint);
+                    canvas.drawText(rightScale, mCoordinateWidth - rightScaleWidth - mFixedSpaceWithLeft, tempLatitudeSpace + verticalOffset, mRightTextPaint);
                 }
             }
         }
+    }
+
+    private float getTextVerticalOffsetByGravity(TextGravity textGravity, float textHeight) {
+        switch (textGravity) {
+            case ABOVE_LINE: {
+                return 0 - mFixedSpaceWithLatitudeLine;
+            }
+            case VERTICAL_CENTER_LINE: {
+                return -textHeight / 2;
+            }
+            case BLEW_LINE: {
+                return textHeight + mFixedSpaceWithLatitudeLine;
+            }
+        }
+        return 0;
     }
 
     private void checkParamter() {
@@ -306,6 +346,24 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
         public abstract String getXBottomScaleString(List<T> dataList, int drawPointIndex, int showPointNums, int scaleIndex, int totalXScaleNum);
     }
 
+    /**
+     * 刻度位置
+     */
+    public enum TextGravity {
+        /**
+         * 在线之上
+         */
+        ABOVE_LINE,
+        /**
+         * 在线之中
+         */
+        VERTICAL_CENTER_LINE,
+        /**
+         * 在线之下
+         */
+        BLEW_LINE
+    }
+
     public CoordinateScaleAdapter getCoordinateScaleAdapter() {
         return mCoordinateScaleAdapter;
     }
@@ -358,8 +416,24 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
         mLatitudeLinePaint.setColor(color);
     }
 
-    public int getMarginBottom() {
-        return mMarginBottom;
+    public int getFixedSpaceWithBottom() {
+        return mFixedSpaceWithBottom;
+    }
+
+    public void setLatitudeTextGravity(TextGravity latitudeTextGravity) {
+        mLatitudeTextGravity = latitudeTextGravity;
+    }
+
+    public void setFixedSpaceWithLeft(float fixedSpaceWithLeft) {
+        mFixedSpaceWithLeft = fixedSpaceWithLeft;
+    }
+
+    public void setFixedSpaceWithLatitudeLine(float fixedSpaceWithLatitudeLine) {
+        mFixedSpaceWithLatitudeLine = fixedSpaceWithLatitudeLine;
+    }
+
+    public void setFixedSpaceWithBottom(int fixedSpaceWithBottom) {
+        mFixedSpaceWithBottom = fixedSpaceWithBottom;
     }
 
     @Override
@@ -372,7 +446,7 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
         for (int i = 0; i < charCount; i++) {
             sb.append("0");
         }
-        return mSpace + mLeftTextPaint.measureText(sb.toString());
+        return mFixedSpaceWithLeft + mLeftTextPaint.measureText(sb.toString());
     }
 
 }

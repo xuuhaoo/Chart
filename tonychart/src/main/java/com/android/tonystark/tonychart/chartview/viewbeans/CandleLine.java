@@ -119,7 +119,7 @@ public class CandleLine extends AbsZoomMoveViewContainer<CandleLine.CandleLineBe
             } else if (candleLineBean.closePrice < candleLineBean.yesterdayPrice) {
                 mCandlePaint.setColor(mDownColor);
             } else {
-                mCandlePaint.setColor(Color.parseColor("#656565"));
+                mCandlePaint.setColor(mEvenColor);
             }
         }
         //进行绘画

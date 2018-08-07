@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.tonystark.tonychart.chartview.adapter.BrokenLineCoordinateAdapter;
@@ -189,12 +190,11 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                                 Log.i("random close", "" + random);
                                 bean.setHeightPrice(random);
                             }
-                            if (mPriceDataList != null && !mPriceDataList.isEmpty()) {
-                                mPriceDataList.remove(mPriceDataList.size() - 1);
-                                mPriceDataList.add(getRandom(1222.001f, 1224.999f) + "");
-                                mPriceLine.setDataList(mPriceDataList);
-                            }
-
+//                            if (mPriceDataList != null && !mPriceDataList.isEmpty()) {
+//                                mPriceDataList.remove(mPriceDataList.size() - 1);
+//                                mPriceDataList.add(getRandom(1222.001f, 1224.999f) + "");
+//                                mPriceLine.setDataList(mPriceDataList);
+//                            }
                             mChartViewImp.notifyNeedForceSyncDataWithFocused();
                             mChartViewImp.postInvalidate();
                             Thread.sleep(1000);
