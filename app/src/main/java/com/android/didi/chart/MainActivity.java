@@ -16,6 +16,7 @@ import com.android.tonystark.tonychart.chartview.adapter.CandleCoordinateAdapter
 import com.android.tonystark.tonychart.chartview.viewbeans.AbsZoomMoveViewContainer;
 import com.android.tonystark.tonychart.chartview.viewbeans.BrokenLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
+import com.android.tonystark.tonychart.chartview.viewbeans.Coordinates;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.Histogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.IndicatorLine;
@@ -276,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 Toast.makeText(view.getContext(), "click", Toast.LENGTH_LONG).show();
             }
         });
+        mChartViewImp.setCoordinateTextGravity(Coordinates.TextGravity.VERTICAL_CENTER_LINE);
         //让图表视图更新
         mChartViewImp.invalidate();
     }

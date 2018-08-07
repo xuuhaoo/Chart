@@ -228,9 +228,7 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
 
                 TextGravity textGravity = mLatitudeTextGravity;
                 if (textGravity == TextGravity.BLEW_LINE || textGravity == TextGravity.VERTICAL_CENTER_LINE) {
-//                    if (mFixedSpaceWithBottom <= 0) {//如果第一条纬线的刻度是在纬线之下,我们就将其设置为最接近的线之上模式,因为线之下显示不了
                     textGravity = TextGravity.ABOVE_LINE;
-//                    }
                 }
 
                 if (!TextUtils.isEmpty(leftScale)) {
@@ -271,7 +269,7 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
                 return 0 - mFixedSpaceWithLatitudeLine;
             }
             case VERTICAL_CENTER_LINE: {
-                return -textHeight / 2;
+                return textHeight / 2;
             }
             case BLEW_LINE: {
                 return textHeight + mFixedSpaceWithLatitudeLine;
