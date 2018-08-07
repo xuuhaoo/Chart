@@ -25,7 +25,7 @@ public interface ChartView {
 
     void requestFocusChild(ViewContainer vc);
 
-    void notifyNeedForceSyncDataWithFocused();
+    void requestSyncDataWithFocused();
 
     boolean isFocused(ViewContainer vc);
 

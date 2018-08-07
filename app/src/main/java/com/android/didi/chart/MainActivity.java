@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.tonystark.tonychart.chartview.adapter.BrokenLineCoordinateAdapter;
@@ -196,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 //                                mPriceDataList.add(getRandom(1222.001f, 1224.999f) + "");
 //                                mPriceLine.setDataList(mPriceDataList);
 //                            }
-                            mChartViewImp.notifyNeedForceSyncDataWithFocused();
+                            mChartViewImp.requestSyncDataWithFocused();
                             mChartViewImp.postInvalidate();
                             Thread.sleep(1000);
                         }
@@ -278,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
             }
         });
         mChartViewImp.setCoordinateTextGravity(Coordinates.TextGravity.VERTICAL_CENTER_LINE);
+
         //让图表视图更新
         mChartViewImp.invalidate();
     }

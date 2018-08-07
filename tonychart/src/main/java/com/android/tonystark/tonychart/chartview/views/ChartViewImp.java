@@ -51,8 +51,6 @@ public class ChartViewImp extends View implements ChartView {
     private Bitmap mSnapshotBitmap = null;
     //快照绘图画布
     private Canvas mSnapshotCanvas = null;
-    //是否有底部间隙
-    private boolean isHasBottomBlack = true;
     //左边间隙
     private int coordinateMarginLeft = 0;
     //手指摁下时的xy点
@@ -195,7 +193,7 @@ public class ChartViewImp extends View implements ChartView {
      * 通知焦点模块数据改变,其他的模块需要刷新数据,与聚焦的View同步
      */
     @Override
-    public void notifyNeedForceSyncDataWithFocused() {
+    public void requestSyncDataWithFocused() {
         mForceSyncFocusChanged = true;
     }
 
@@ -312,8 +310,10 @@ public class ChartViewImp extends View implements ChartView {
      * 给组件设置画布的宽高
      */
     private void setDrawRect(ViewContainer vc, int width, int height) {
-        if (isHasBottomBlack && mCoordinates != null) {
-            height = height - mCoordinates.getFixedSpaceWithBottom();//为底部留出空隙
+        int coordinateBottom = 0;
+        if (mCoordinates != null) {
+            coordinateBottom = (int) mCoordinates.getFixedSpaceWithBottom();
+            height = height - coordinateBottom;//为底部留出空隙
         }
 
         mCoordinateRectF.top = 0;
@@ -554,7 +554,7 @@ public class ChartViewImp extends View implements ChartView {
             followFocusedView.setDrawPointIndex(mFocusedView.getDrawPointIndex());
             followFocusedView.setMinShownPointNums(mFocusedView.getMinShownPointNums());
 
-            mFollowView.notifyNeedForceSyncDataWithFocused();
+            mFollowView.requestSyncDataWithFocused();
         }
     }
 
@@ -815,10 +815,30 @@ public class ChartViewImp extends View implements ChartView {
     }
 
     /**
-     * 设置底部间隙
+     * 设置坐标系底部刻度字体大小
      */
-    public void setHasBottomScaleBlack(boolean has) {
-        this.isHasBottomBlack = has;
+    public void setCoordinateBottomTextSize(float sp) {
+        if (mCoordinates != null) {
+            mCoordinates.setBottomTextSize(sp);
+        }
+    }
+
+    /**
+     * 设置坐标系左部刻度字体大小
+     */
+    public void setCoordinateLeftTextSize(float sp) {
+        if (mCoordinates != null) {
+            mCoordinates.setLeftTextSize(sp);
+        }
+    }
+
+    /**
+     * 设置坐标系右部刻度字体大小
+     */
+    public void setCoordinateRightTextSize(float sp) {
+        if (mCoordinates != null) {
+            mCoordinates.setRightTextSize(sp);
+        }
     }
 
     /**

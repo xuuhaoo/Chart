@@ -64,7 +64,7 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
     //横向的padding
     private float mPaddingHorizontalDP = 2;
     //纵向的padding
-    private float mPaddingVerticalDP = 2;
+    private float mPaddingVerticalDP = 1;
     //圆角半径
     private float mCornerRoundRadius = 4;
     //是否显示文字背景
@@ -294,7 +294,7 @@ public class CrossLine extends ViewContainer<String> implements UnabelFocusedsVi
         //计算背景宽高
         RectF roundBg = new RectF();
         roundBg.left = x;
-        roundBg.top = mCoordinateHeight + mSpace;
+        roundBg.top = mCoordinateHeight;
         roundBg.right = roundBg.left + mTextPaint.measureText(indicateValue) + getPixelDp(mPaddingHorizontalDP) * 2;
         roundBg.bottom = roundBg.top + height + getPixelDp(mPaddingVerticalDP) * 2;
         //保证线在这个矩形中间
