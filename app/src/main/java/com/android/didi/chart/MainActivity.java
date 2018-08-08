@@ -12,7 +12,8 @@ import android.widget.Toast;
 
 import com.android.tonystark.tonychart.chartview.adapter.BrokenLineCoordinateAdapter;
 import com.android.tonystark.tonychart.chartview.adapter.CandleCoordinateAdapter;
-import com.android.tonystark.tonychart.chartview.viewbeans.AbsZoomMoveViewContainer;
+import com.android.tonystark.tonychart.chartview.adapter.FocusedCoordinateAdapter;
+import com.android.tonystark.tonychart.chartview.viewbeans.ZoomMoveViewContainer;
 import com.android.tonystark.tonychart.chartview.viewbeans.BrokenLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.Coordinates;
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 mCandleLine.requestFocused();
                 mCandleLine.setExtremeCalculatorInterface(new MyExtremeCalculator(mChartViewImp));
                 mChartViewImp.addChild(mCandleLine);
-                mCandleLine.setOnMoveListener(new AbsZoomMoveViewContainer.OnMoveListener() {
+                mCandleLine.setOnMoveListener(new ZoomMoveViewContainer.OnMoveListener() {
                     @Override
                     public void onMove(ViewContainer viewContainer, int drawPointIndex, int currentShownNums, float yMax, float yMin) {
                         Log.i("onMove", "drawPointIndex:" + drawPointIndex + " currentShownNums:" + currentShownNums + " yMax:" + yMax + " yMin:" + yMin);
@@ -136,15 +137,12 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                     }
                 });
 
-                //设置主图的坐标系刻度适配器(因为当前聚焦的是K线图,所以坐标系需要展示K线的刻度适配器)
-                mChartViewImp.setCoordinateScaleAdapter(new CandleCoordinateAdapter(mCandleLine));
-
-
                 IndicatorLine indicatorLine = getIndicatorLine();
                 mChartViewImp.addChild(indicatorLine);
 
                 //得到创建好的组件
                 Histogram histogram = getHistogram();
+                histogram.setExtremeCalculatorInterface(new MyExtremeCalculator(mChartSubViewImp));
                 //添加组件到副图中
                 mChartSubViewImp.addChild(histogram);
             }
@@ -269,6 +267,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mChartViewImp.setCoordinateLongitudeNum(4);
         //设置坐标系背景
         mChartViewImp.setCoordinateBackground(0xfff2efef);
+        //设置主图的坐标系刻度适配器
+        mChartViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter(mChartViewImp));
         //设置点击事件
         mChartViewImp.setOnChartViewClickListener(new ChartViewImp.OnChartViewClickListener() {
             @Override
@@ -276,8 +276,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 Toast.makeText(view.getContext(), "click", Toast.LENGTH_LONG).show();
             }
         });
+        //设置纬线刻度居中模式
         mChartViewImp.setCoordinateTextGravity(Coordinates.TextGravity.VERTICAL_CENTER_LINE);
-
         //让图表视图更新
         mChartViewImp.invalidate();
     }
@@ -297,6 +297,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mChartSubViewImp.setCoordinateLatitudeNum(5);
         //设置坐标系经线(竖着的)个数,包含左边框和右边框
         mChartSubViewImp.setCoordinateLongitudeNum(4);
+        //设置主图的坐标系刻度适配器
+        mChartSubViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter(mChartViewImp));
         //设置点击事件
         mChartSubViewImp.setOnChartViewClickListener(new ChartViewImp.OnChartViewClickListener() {
             @Override
@@ -304,6 +306,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 Toast.makeText(view.getContext(), "click", Toast.LENGTH_LONG).show();
             }
         });
+        //设置底部文字大小为0
+        mChartSubViewImp.setCoordinateBottomTextSize(0);
         //让图表视图更新
         mChartSubViewImp.invalidate();
     }
@@ -322,6 +326,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         macdHistogram.setDataList(list);
         //设置该组件默认显示的数据量
         macdHistogram.setDefaultShowPointNums(50);
+        //设置该组件最大显示数据量
+        macdHistogram.setMaxShownPointNums(list.size());
         //设置该组件默认起始绘制的下标数
         macdHistogram.setDrawPointIndex(list.size() - macdHistogram.getDefaultShowPointNums());
         //设置涨的颜色
@@ -347,6 +353,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         histogram.setDataList(list);
         //设置该组件默认显示的数据量
         histogram.setDefaultShowPointNums(50);
+        //设置该组件最大显示数据量
+        histogram.setMaxShownPointNums(list.size());
         //设置该组件默认起始绘制的下标数
         histogram.setDrawPointIndex(list.size() - histogram.getDefaultShowPointNums());
         //设置涨的颜色
@@ -372,6 +380,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         candleLine.setDataList(mKDataList);
         //设置该组件默认显示的数据量
         candleLine.setDefaultShowPointNums(50);
+        //设置该组件最大显示数据量
+        candleLine.setMaxShownPointNums(mKDataList.size());
         //设置该组件默认起始绘制的下标数
         candleLine.setDrawPointIndex(mKDataList.size() - candleLine.getDefaultShowPointNums());
         //设置涨的颜色
@@ -402,6 +412,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         brokenLine.setDataList(mPriceDataList);
         //设置该折线组件默认显示的数据量
         brokenLine.setDefaultShowPointNums(50);
+        //设置该组件最大显示数据量
+        brokenLine.setMaxShownPointNums(mPriceDataList.size());
         //设置该折线组件默认起始绘制的下标数
         brokenLine.setDrawPointIndex(mPriceDataList.size() - brokenLine.getDefaultShowPointNums());
         //是否为折线组件填充背景色

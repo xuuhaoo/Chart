@@ -4,13 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PointF;
 import android.graphics.Rect;
-import android.util.Log;
-import android.view.MotionEvent;
-
-
-import java.util.List;
 
 /**
  * 描述：蜡烛线
@@ -18,7 +12,7 @@ import java.util.List;
  * @author xuhao
  * @version 1.0
  */
-public class CandleLine extends AbsZoomMoveViewContainer<CandleLine.CandleLineBean> {
+public class CandleLine extends ZoomMoveViewContainer<CandleLine.CandleLineBean> {
 
     //极值指示线长度
     private static final int EXTREME_INDICATOR_LINE_WIDTH = 30;

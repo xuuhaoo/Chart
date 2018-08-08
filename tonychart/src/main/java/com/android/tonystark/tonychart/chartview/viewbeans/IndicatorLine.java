@@ -9,7 +9,6 @@ import android.graphics.PathEffect;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
-import android.view.MotionEvent;
 
 import com.android.tonystark.tonychart.chartview.interfaces.AboveCoordinatesView;
 import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
@@ -20,7 +19,7 @@ import java.util.List;
 /**
  * 数据指示器
  */
-public class IndicatorLine extends AbsZoomMoveViewContainer implements UnabelFocusedsView, AboveCoordinatesView {
+public class IndicatorLine extends ZoomMoveViewContainer implements UnabelFocusedsView, AboveCoordinatesView {
     //线画笔
     private Paint mLinePaint = null;
     //文字画笔

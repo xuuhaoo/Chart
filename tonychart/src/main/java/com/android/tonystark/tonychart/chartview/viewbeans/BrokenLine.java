@@ -9,7 +9,6 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Shader;
 import android.text.TextUtils;
-import android.view.MotionEvent;
 
 import com.android.tonystark.tonychart.chartview.utils.DataUtils;
 
@@ -22,7 +21,7 @@ import java.util.List;
  * @author xuhao
  * @version 1.0
  */
-public class BrokenLine extends AbsZoomMoveViewContainer<String> {
+public class BrokenLine extends ZoomMoveViewContainer<String> {
     //最小移动距离
     private static final int MIN_MOVE_DISTANCE = 5;
     //线画笔

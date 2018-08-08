@@ -5,7 +5,7 @@ import android.graphics.PointF;
 import android.support.annotation.CallSuper;
 import android.view.MotionEvent;
 
-public class AbsZoomMoveViewContainer<T> extends ViewContainer<T> {
+public class ZoomMoveViewContainer<T> extends ViewContainer<T> {
     //最小手指间距离
     private static final int MIN_FINGER_DISTANCE = 10;
     //最小移动距离
@@ -18,12 +18,13 @@ public class AbsZoomMoveViewContainer<T> extends ViewContainer<T> {
     private float mDistance = 0f;
     //滑动的时候摁下的第一个点
     private PointF mMoveDownPointF = new PointF();
-
+    //放大缩小监听器
     private OnZoomListener mZoomListener;
-
+    //滑动监听器
     private OnMoveListener mMoveListener;
 
-    public AbsZoomMoveViewContainer(Context context) {
+
+    public ZoomMoveViewContainer(Context context) {
         super(context);
     }
 
@@ -122,7 +123,7 @@ public class AbsZoomMoveViewContainer<T> extends ViewContainer<T> {
     private void notifyZoomListener() {
         if (mZoomListener != null) {
             try {
-                mZoomListener.onZoom(this, mDefaultShowPointNums, mShownPointNums, mMinShownPointNums, mDrawPointIndex, mZoomCenterIndex, mYMax, mYMin);
+                mZoomListener.onZoom(this, mDefaultShowPointNums, mShownPointNums, mMinShownPointNums, mMaxShownPointNums, mDrawPointIndex, mZoomCenterIndex, mYMax, mYMin);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -163,13 +164,13 @@ public class AbsZoomMoveViewContainer<T> extends ViewContainer<T> {
      * @return 标识是否进行了缩小, true代表showPointNums进行了++;
      */
     private boolean zoomOut(int scale) {
-        if (mShownPointNums < mDefaultShowPointNums) {
+        if (mShownPointNums < mMaxShownPointNums) {
             //增加点根数
             mShownPointNums = mShownPointNums + scale;
-            mShownPointNums = mShownPointNums > mDefaultShowPointNums ? mDefaultShowPointNums : mShownPointNums;
+            mShownPointNums = mShownPointNums > mMaxShownPointNums ? mMaxShownPointNums : mShownPointNums;
             return true;
         } else {
-            mShownPointNums = mDefaultShowPointNums;
+            mShownPointNums = mMaxShownPointNums;
             return false;
         }
     }
@@ -239,7 +240,7 @@ public class AbsZoomMoveViewContainer<T> extends ViewContainer<T> {
     }
 
     public interface OnZoomListener {
-        void onZoom(ViewContainer viewContainer, int defaultShownNums, int currentShownNums, int minShownPointNums, int drawPointIndex, int zoomCenterPointIndex, float yMax, float yMin);
+        void onZoom(ViewContainer viewContainer, int defaultShownNums, int currentShownNums, int minShownPointNums, int maxShownPointNums, int drawPointIndex, int zoomCenterPointIndex, float yMax, float yMin);
     }
 
     public interface OnMoveListener {
@@ -253,4 +254,5 @@ public class AbsZoomMoveViewContainer<T> extends ViewContainer<T> {
     public void setOnMoveListener(OnMoveListener moveListener) {
         mMoveListener = moveListener;
     }
+
 }

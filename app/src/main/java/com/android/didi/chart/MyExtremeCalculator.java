@@ -74,8 +74,8 @@ public class MyExtremeCalculator implements ViewContainer.ExtremeCalculatorInter
                 Histogram histogram = (Histogram) viewContainer;
                 List<Histogram.HistogramBean> list = histogram.getDataList();
                 for (int i = drawPointIndex; i < drawPointIndex + showPointNums && i < list.size(); i++) {
-                    Histogram.HistogramBean macdBean = list.get(i);
-                    dataList.add(macdBean.getTurnover() + "");
+                    Histogram.HistogramBean bean = list.get(i);
+                    dataList.add(bean.getTurnover() + "");
                 }
             }
         }

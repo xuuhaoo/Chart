@@ -18,6 +18,7 @@ import android.view.ViewTreeObserver;
 
 import com.android.didi.crash_lib.CrashManager;
 import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
+import com.android.tonystark.tonychart.chartview.viewbeans.ZoomMoveViewContainer;
 import com.android.tonystark.tonychart.chartview.viewbeans.ChartView;
 import com.android.tonystark.tonychart.chartview.viewbeans.Coordinates;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
@@ -114,7 +115,7 @@ public class ChartViewImp extends View implements ChartView {
      */
     private void initObject() {
         this.setBackgroundColor(0xffffffff);
-        mViewContainer = new ViewContainer(mContext);//所有控件承载体
+        mViewContainer = new ViewContainer<>(mContext);//所有控件承载体
         mViewContainer.setChartView(this);
 
         mCoordinates = new Coordinates(mContext);//坐标系
@@ -539,6 +540,8 @@ public class ChartViewImp extends View implements ChartView {
         mViewContainer.setDrawPointIndex(mFocusedView.getDrawPointIndex());
         //设置最少能显示的数据个数,跟随焦点组件
         mViewContainer.setMinShownPointNums(mFocusedView.getMinShownPointNums());
+        //设置最多能显示的数据个数,跟随焦点组件
+        mViewContainer.setMaxShownPointNums(mFocusedView.getMaxShownPointNums());
 
         //设置其他组件不计算坐标系最大最小值
         mViewContainer.setCalculateDataExtremum(false);
@@ -553,6 +556,7 @@ public class ChartViewImp extends View implements ChartView {
             followFocusedView.setDefaultShowPointNums(mFocusedView.getDefaultShowPointNums(), false);
             followFocusedView.setDrawPointIndex(mFocusedView.getDrawPointIndex());
             followFocusedView.setMinShownPointNums(mFocusedView.getMinShownPointNums());
+            followFocusedView.setMaxShownPointNums(mFocusedView.getMaxShownPointNums());
 
             mFollowView.requestSyncDataWithFocused();
         }

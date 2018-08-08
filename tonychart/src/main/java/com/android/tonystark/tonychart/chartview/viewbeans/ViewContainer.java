@@ -3,6 +3,7 @@ package com.android.tonystark.tonychart.chartview.viewbeans;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.support.annotation.CallSuper;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 
@@ -53,14 +54,17 @@ public class ViewContainer<T extends Object> {
     protected ExtremeCalculatorInterface mExtremeCalculatorInterface = null;
     //从第几个点开始画
     protected int mDrawPointIndex = 0;
-    //显示的点数
-    protected int mShownPointNums = 2;
-    //最少显示的点数
-    protected int mMinShownPointNums = 2;
-    //默认显示点数
-    protected int mDefaultShowPointNums = 0;
     //十字光标点的数据集合
     protected List<String> mCrossDataList = new ArrayList<>();
+
+    //最少显示的点数
+    protected int mMinShownPointNums = 1;
+    //最多显示的点数
+    protected int mMaxShownPointNums = 10;
+    //默认显示点数
+    protected int mDefaultShowPointNums = mMaxShownPointNums;
+    //显示的点数
+    protected int mShownPointNums = mDefaultShowPointNums;
 
     public ViewContainer(Context context) {
         mContext = context.getApplicationContext();
@@ -342,7 +346,7 @@ public class ViewContainer<T extends Object> {
      * @param shownPointNums
      */
     void setShownPointNums(int shownPointNums) {
-        //应该计算获得,不应该赋值
+        //不处理
     }
 
     /**
@@ -364,16 +368,12 @@ public class ViewContainer<T extends Object> {
     }
 
     /**
-     * 设置最少显示的数据个数
+     * 获取屏幕最多显示的数据个数
      *
-     * @param minShownPointNums
+     * @return
      */
-    @CallSuper
-    public void setMinShownPointNums(int minShownPointNums) {
-        this.mMinShownPointNums = minShownPointNums;
-        for (ViewContainer container : getChildrenList()) {
-            container.setMinShownPointNums(this.mMinShownPointNums);
-        }
+    public int getMaxShownPointNums() {
+        return mMaxShownPointNums;
     }
 
     /**
@@ -396,12 +396,23 @@ public class ViewContainer<T extends Object> {
     }
 
     /**
+     * 设置最少显示的数据个数
+     *
+     * @param minShownPointNums
+     */
+    public void setMinShownPointNums(int minShownPointNums) {
+        this.mMinShownPointNums = minShownPointNums;
+        for (ViewContainer container : getChildrenList()) {
+            container.setMinShownPointNums(minShownPointNums);
+        }
+    }
+
+    /**
      * 设置默认显示的数据个数,支持同步设置显示的点数
      *
      * @param defaultShowPointNums
      * @param syncShowPointNums
      */
-    @CallSuper
     public void setDefaultShowPointNums(int defaultShowPointNums, boolean syncShowPointNums) {
         this.mDefaultShowPointNums = defaultShowPointNums;
         if (syncShowPointNums) {
@@ -409,6 +420,18 @@ public class ViewContainer<T extends Object> {
         }
         for (ViewContainer container : getChildrenList()) {
             container.setDefaultShowPointNums(defaultShowPointNums, syncShowPointNums);
+        }
+    }
+
+    /**
+     * 设置最多显示的数据个数
+     *
+     * @param maxShownPointNums
+     */
+    public void setMaxShownPointNums(int maxShownPointNums) {
+        mMaxShownPointNums = maxShownPointNums;
+        for (ViewContainer container : getChildrenList()) {
+            container.setMaxShownPointNums(maxShownPointNums);
         }
     }
 

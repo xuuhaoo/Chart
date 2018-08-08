@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.view.MotionEvent;
 
 import com.android.tonystark.tonychart.chartview.utils.DataUtils;
 
@@ -18,7 +17,7 @@ import java.util.List;
  * @author xuhao
  * @version 1.0
  */
-public class MACDHistogram extends AbsZoomMoveViewContainer<MACDHistogram.MACDBean> {
+public class MACDHistogram extends ZoomMoveViewContainer<MACDHistogram.MACDBean> {
     //实心画笔
     private Paint mFillPaint = null;
     //是否填充
@@ -48,11 +47,6 @@ public class MACDHistogram extends AbsZoomMoveViewContainer<MACDHistogram.MACDBe
         mFillPaint.setAntiAlias(true);
         mFillPaint.setStyle(Paint.Style.FILL);
         mFillPaint.setStrokeWidth(getPixelDp(1));
-
-        mDrawPointIndex = 0;
-        mShownPointNums = 2;
-        mMinShownPointNums = 1;
-        mDefaultShowPointNums = 2;
     }
 
     @Override
@@ -145,16 +139,6 @@ public class MACDHistogram extends AbsZoomMoveViewContainer<MACDHistogram.MACDBe
         }
     }
 
-    public void setCoordinateHeight(float coordinateHeight) {
-        super.setCoordinateHeight(coordinateHeight);
-        //do noting
-    }
-
-    public void setCoordinateWidth(float coordinateWidth) {
-        super.setCoordinateWidth(coordinateWidth);
-        //do noting
-    }
-
     public void setColor(int upColor, int evenColor, int downColor) {
         this.mUpColor = upColor;
         this.mDownColor = downColor;
@@ -173,38 +157,8 @@ public class MACDHistogram extends AbsZoomMoveViewContainer<MACDHistogram.MACDBe
         this.mDownColor = downColor;
     }
 
-
     public boolean isFill() {
         return isFill;
-    }
-
-    public int getDrawHistogramIndex() {
-        return mDrawPointIndex;
-    }
-
-    public void setDrawHistogramIndex(int drawPointIndex) {
-        this.mDrawPointIndex = drawPointIndex;
-    }
-
-    public int getShowHistogramNums() {
-        return mShownPointNums;
-    }
-
-    public int getMinHistogramNums() {
-        return mMinShownPointNums;
-    }
-
-    public void setMinHistogramNums(int minPointNums) {
-        this.mMinShownPointNums = minPointNums;
-    }
-
-    public int getDefaultShowHistogramNums() {
-        return mDefaultShowPointNums;
-    }
-
-    public void setDefaultShowHistogramNums(int defaultShowPointNums) {
-        this.mDefaultShowPointNums = defaultShowPointNums;
-        this.mShownPointNums = this.mDefaultShowPointNums;
     }
 
     public void setFill(boolean isFill) {

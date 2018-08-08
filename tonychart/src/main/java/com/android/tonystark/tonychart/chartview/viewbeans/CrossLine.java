@@ -20,7 +20,7 @@ import java.util.List;
  * @author xuhao
  * @version 1.0
  */
-public class CrossLine extends ViewContainer<String> implements UnabelFocusedsView {
+public class CrossLine extends ZoomMoveViewContainer<String> implements UnabelFocusedsView {
     //线画笔
     private Paint mLinePaint = null;
     //点画笔

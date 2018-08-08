@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.view.MotionEvent;
 
 import com.android.tonystark.tonychart.chartview.utils.DataUtils;
 
@@ -18,7 +17,7 @@ import java.util.List;
  * @author xuhao
  * @version 1.0
  */
-public class Histogram extends AbsZoomMoveViewContainer<Histogram.HistogramBean> {
+public class Histogram extends ZoomMoveViewContainer<Histogram.HistogramBean> {
     //实心画笔
     private Paint mFillPaint = null;
     //是否填充
@@ -45,11 +44,6 @@ public class Histogram extends AbsZoomMoveViewContainer<Histogram.HistogramBean>
         this.mFillPaint = new Paint();
         mFillPaint.setAntiAlias(true);
         mFillPaint.setStyle(Paint.Style.FILL);
-
-        mDrawPointIndex = 0;
-        mShownPointNums = 2;
-        mMinShownPointNums = 1;
-        mDefaultShowPointNums = 2;
     }
 
     @Override
@@ -189,8 +183,8 @@ public class Histogram extends AbsZoomMoveViewContainer<Histogram.HistogramBean>
     public float[] calculateExtremeY() {
         if (mExtremeCalculatorInterface != null) {
             float yMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-            float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
-            return new float[]{yMin, yMax};
+//            float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
+            return new float[]{0, yMax};
         } else if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             List<String> dataList = new ArrayList<>();
             for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {
