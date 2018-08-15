@@ -8,8 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-public class CandleCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<CandleLine.CandleLineBean> {
+ class CandleCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<CandleLine.CandleLineBean> {
 
     private SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
 
@@ -27,9 +26,6 @@ public class CandleCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<
 
         float min = extreme[0];
         float max = extreme[1];
-
-        max = calYMaxWithSpace(max, min, totalYScaleNum);
-        min = calYMinWithSpace(max, min, totalYScaleNum);
 
         float decrease = (max - min) / (totalYScaleNum - 1);//递减量
         for (int i = 0; i <= scaleIndex; i++) {

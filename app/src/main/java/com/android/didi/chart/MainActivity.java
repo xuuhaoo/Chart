@@ -10,8 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.android.tonystark.tonychart.chartview.adapter.BrokenLineCoordinateAdapter;
-import com.android.tonystark.tonychart.chartview.adapter.CandleCoordinateAdapter;
 import com.android.tonystark.tonychart.chartview.adapter.FocusedCoordinateAdapter;
 import com.android.tonystark.tonychart.chartview.viewbeans.ZoomMoveViewContainer;
 import com.android.tonystark.tonychart.chartview.viewbeans.BrokenLine;
@@ -27,6 +25,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.xuhao.android.libsocket.sdk.OkSocket;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -93,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 //显示调用如下:brokenLine.requestFocus();
                 mChartViewImp.addChild(mPriceLine);
                 //设置主图的坐标系刻度适配器(因为当前聚焦的是折线图,所以坐标系需要展示折线的刻度适配器)
-                mChartViewImp.setCoordinateScaleAdapter(new BrokenLineCoordinateAdapter(mPriceLine));
+                mChartViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter(mChartViewImp));
                 //得到创建好的组件
                 MACDHistogram macdHistogram = getMACD();
                 //添加组件到副图中

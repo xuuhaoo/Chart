@@ -6,8 +6,7 @@ import com.android.tonystark.tonychart.chartview.viewbeans.Histogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.MACDHistogram;
 
 import java.util.List;
-
-public class HistogramCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<Histogram.HistogramBean> {
+ class HistogramCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<Histogram.HistogramBean> {
 
     private Histogram mHistogram;
 
@@ -23,9 +22,6 @@ public class HistogramCoordinateAdapter extends Coordinates.CoordinateScaleAdapt
 
         float min = extreme[0];
         float max = extreme[1];
-
-        max = calYMaxWithSpace(max, min, totalYScaleNum);
-        min = calYMinWithSpace(max, min, totalYScaleNum);
 
         float decrease = (max - min) / (totalYScaleNum - 1);//递减量
         for (int i = 0; i <= scaleIndex; i++) {

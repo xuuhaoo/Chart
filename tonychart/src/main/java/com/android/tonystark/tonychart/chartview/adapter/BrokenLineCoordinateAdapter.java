@@ -6,8 +6,7 @@ import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.Coordinates;
 
 import java.util.List;
-
-public class BrokenLineCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<String> {
+ class BrokenLineCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<String> {
 
     private BrokenLine mBrokenLine;
 
@@ -23,9 +22,6 @@ public class BrokenLineCoordinateAdapter extends Coordinates.CoordinateScaleAdap
 
         float min = extreme[0];
         float max = extreme[1];
-
-        max = calYMaxWithSpace(max, min, totalYScaleNum);
-        min = calYMinWithSpace(max, min, totalYScaleNum);
 
         float decrease = (max - min) / (totalYScaleNum - 1);//递减量
         for (int i = 0; i <= scaleIndex; i++) {

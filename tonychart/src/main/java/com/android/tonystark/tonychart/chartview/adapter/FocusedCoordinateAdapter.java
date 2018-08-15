@@ -11,6 +11,8 @@ public class FocusedCoordinateAdapter extends Coordinates.CoordinateScaleAdapter
 
     private ChartView mChartView;
 
+    private int mKeepNums = 3;
+
     public FocusedCoordinateAdapter(ChartView chartView) {
         mChartView = chartView;
     }
@@ -26,15 +28,12 @@ public class FocusedCoordinateAdapter extends Coordinates.CoordinateScaleAdapter
         float min = extreme[0];
         float max = extreme[1];
 
-        max = calYMaxWithSpace(max, min, totalYScaleNum);
-        min = calYMinWithSpace(max, min, totalYScaleNum);
-
         float decrease = (max - min) / (totalYScaleNum - 1);//递减量
         for (int i = 0; i <= scaleIndex; i++) {
             scale = (max - (decrease * i)) + "";
         }
 
-        return DataUtils.format(scale, 3, true);
+        return DataUtils.format(scale, mKeepNums, true);
     }
 
     @Override
@@ -45,5 +44,9 @@ public class FocusedCoordinateAdapter extends Coordinates.CoordinateScaleAdapter
     @Override
     public String getXBottomScaleString(List dataList, int drawPointIndex, int showPointNums, int scaleIndex, int totalXScaleNum) {
         return "";
+    }
+
+    public void setKeepNums(int keepNums) {
+        mKeepNums = keepNums;
     }
 }

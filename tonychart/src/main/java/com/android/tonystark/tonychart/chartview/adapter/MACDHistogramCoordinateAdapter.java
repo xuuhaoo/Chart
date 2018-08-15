@@ -7,7 +7,7 @@ import com.android.tonystark.tonychart.chartview.viewbeans.MACDHistogram;
 
 import java.util.List;
 
-public class MACDHistogramCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<MACDHistogram.MACDBean> {
+class MACDHistogramCoordinateAdapter extends Coordinates.CoordinateScaleAdapter<MACDHistogram.MACDBean> {
 
     private MACDHistogram mMACDHistogram;
 
@@ -23,9 +23,6 @@ public class MACDHistogramCoordinateAdapter extends Coordinates.CoordinateScaleA
 
         float min = extreme[0];
         float max = extreme[1];
-
-        max = calYMaxWithSpace(max, min, totalYScaleNum);
-        min = calYMinWithSpace(max, min, totalYScaleNum);
 
         float decrease = (max - min) / (totalYScaleNum - 1);//递减量
         for (int i = 0; i <= scaleIndex; i++) {
