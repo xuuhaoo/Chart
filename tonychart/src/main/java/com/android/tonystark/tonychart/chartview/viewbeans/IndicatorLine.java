@@ -138,13 +138,20 @@ public class IndicatorLine extends ZoomMoveViewContainer implements UnabelFocuse
         //文字高度
         Paint.FontMetrics fm = new Paint.FontMetrics();
         mTextPaint.getFontMetrics(fm);
-        float height = Math.abs(fm.ascent);
+        float textHeight = Math.abs(fm.ascent);
+        //文字框子最小高度
+        float minHeight = textHeight + getPixelDp(mPaddingVerticalDP) * 2;
+        //因为框子是在线中央的
+        minHeight -= minHeight / 2f;
+        //文字框子的最大高度
+        float maxHeight = mCoordinateHeight - minHeight;
+        mPointF.y = mPointF.y < minHeight ? minHeight : (mPointF.y > maxHeight ? maxHeight : mPointF.y);
         //计算背景宽高
         RectF roundBg = new RectF();
         roundBg.left = mSpace;
         roundBg.top = mPointF.y;
         roundBg.right = roundBg.left + mTextPaint.measureText(str) + getPixelDp(mPaddingHorizontalDP) * 2;
-        roundBg.bottom = roundBg.top + height + getPixelDp(mPaddingVerticalDP) * 2;
+        roundBg.bottom = roundBg.top + textHeight + getPixelDp(mPaddingVerticalDP) * 2;
         //保证线在这个矩形中间
         float recHeight = roundBg.height();
         roundBg.top -= recHeight / 2;
@@ -155,7 +162,7 @@ public class IndicatorLine extends ZoomMoveViewContainer implements UnabelFocuse
             canvas.drawRoundRect(roundBg, mCornerRoundRadius, mCornerRoundRadius, mTextBgPaint);
         }
         //绘制文字
-        canvas.drawText(str, roundBg.left + getPixelDp(mPaddingHorizontalDP), roundBg.top + getPixelDp(mPaddingVerticalDP) / 2 + height, mTextPaint);
+        canvas.drawText(str, roundBg.left + getPixelDp(mPaddingHorizontalDP), roundBg.top + getPixelDp(mPaddingVerticalDP) / 2 + textHeight, mTextPaint);
     }
 
     private void checkParameter() {
