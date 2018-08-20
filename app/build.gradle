@@ -18,12 +18,12 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:26.1.0'
 //    api 'com.tonystark.android:chart:0.0.9'
 
-    implementation project(':tonychart')
-    implementation 'com.google.code.gson:gson:2.8.0'
-    implementation 'com.tonystark.android:socket:2.0.4'
+    compile project(':tonychart')
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.tonystark.android:socket:2.0.4'
 
 }

@@ -1,1 +1,1 @@
-include ':app', ':tonychart', ':crash'
+include ':app', ':tonychart'
