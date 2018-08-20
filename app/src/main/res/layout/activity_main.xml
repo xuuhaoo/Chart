@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.android.didi.chart.MainActivity">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#111419"
+              android:orientation="vertical"
+              tools:context="com.android.didi.chart.MainActivity">
 
 
     <LinearLayout
@@ -18,42 +18,42 @@
             android:id="@+id/start_changed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="启动数据改变" />
+            android:text="启动数据改变"/>
 
         <Button
             android:id="@+id/stop_changed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="停止数据改变" />
+            android:text="停止数据改变"/>
 
         <Button
             android:id="@+id/add_k_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="切换K" />
+            android:text="切换K"/>
 
         <Button
             android:id="@+id/add_now_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="切换分时" />
+            android:text="切换分时"/>
 
         <Button
             android:id="@+id/delete_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clear" />
+            android:text="Clear"/>
 
     </LinearLayout>
 
     <com.android.tonystark.tonychart.chartview.views.ChartViewImp
         android:id="@+id/chart_view"
         android:layout_width="match_parent"
-        android:layout_height="200dp" />
+        android:layout_height="200dp"/>
 
     <com.android.tonystark.tonychart.chartview.views.ChartViewImp
         android:id="@+id/chart_sub_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

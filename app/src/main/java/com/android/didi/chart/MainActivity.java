@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
                 //得到刚才创建好的组件
                 mPriceLine = getBrokenLine();
+                mPriceLine.setLineColor(0xff3d7c83);
+                mPriceLine.setLineFillColor(0xff3d7c83, 50);
                 //添加组件到主图中,因为当前主图中组件数量为空,所以第一个添加的组件默认为focused(聚焦)组件,不用显示的调用requestFocuse()函数.
                 //当然显示的调用也是没有问题的.
                 //显示调用如下:brokenLine.requestFocus();
@@ -113,9 +115,9 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
 
                 //得到刚才创建好的组件
-                mPriceLine = getBrokenLine();
+//                mPriceLine = getBrokenLine();
                 //添加组件到主图中
-                mChartViewImp.addChild(mPriceLine);
+//                mChartViewImp.addChild(mPriceLine);
 
                 //得到创建好的组件
                 mCandleLine = getCandleLine();
@@ -135,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                     }
                 });
 
-                IndicatorLine indicatorLine = getIndicatorLine();
-                mChartViewImp.addChild(indicatorLine);
+//                IndicatorLine indicatorLine = getIndicatorLine();
+//                mChartViewImp.addChild(indicatorLine);
 
                 //得到创建好的组件
                 Histogram histogram = getHistogram();
@@ -257,15 +259,16 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置坐标系线的样式
         mChartViewImp.setCoordinateLineEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 1));
         //设置坐标系线的颜色
-        mChartViewImp.setCoordinateLineColor(0xff989898);
+        mChartViewImp.setCoordinateLineColor(0xff36495f);
         //设置坐标系刻度值文字颜色
-        mChartViewImp.setCoordinateTextColor(0xff989898);
+        mChartViewImp.setCoordinateTextColor(0xff757a80);
         //设置坐标系纬线(横着的)个数,包含顶边框和底边框
-        mChartViewImp.setCoordinateLatitudeNum(5);
+        mChartViewImp.setCoordinateLatitudeNum(6);
         //设置坐标系经线(竖着的)个数,包含左边框和右边框
         mChartViewImp.setCoordinateLongitudeNum(4);
         //设置坐标系背景
-        mChartViewImp.setCoordinateBackground(0xfff2efef);
+        mChartViewImp.setCoordinateBackground(0xff111419);
+        mChartViewImp.setBackgroundColor(0xff111419);
         //设置主图的坐标系刻度适配器
         mChartViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter());
         //设置点击事件
@@ -289,11 +292,14 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置坐标系线的样式
         mChartSubViewImp.setCoordinateLineEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 1));
         //设置坐标系线的颜色
-        mChartSubViewImp.setCoordinateLineColor(0xff989898);
+        mChartSubViewImp.setCoordinateLineColor(0xff36495f);
         //设置坐标系刻度值文字颜色
-        mChartSubViewImp.setCoordinateTextColor(0xff989898);
+        mChartSubViewImp.setCoordinateTextColor(0xff757a80);
+        //设置坐标系背景
+        mChartSubViewImp.setCoordinateBackground(0xff111419);
+        mChartSubViewImp.setBackgroundColor(0xff111419);
         //设置坐标系纬线(横着的)个数,包含顶边框和底边框
-        mChartSubViewImp.setCoordinateLatitudeNum(5);
+        mChartSubViewImp.setCoordinateLatitudeNum(2);
         //设置坐标系经线(竖着的)个数,包含左边框和右边框
         mChartSubViewImp.setCoordinateLongitudeNum(4);
         //设置主图的坐标系刻度适配器
@@ -330,9 +336,9 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置该组件默认起始绘制的下标数
         macdHistogram.setDrawPointIndex(list.size() - macdHistogram.getDefaultShowPointNums());
         //设置涨的颜色
-        macdHistogram.setUpColor(0xfff5515f);
+        macdHistogram.setUpColor(0xffa23c0c);
         //设置跌的颜色
-        macdHistogram.setDownColor(0xff00b78f);
+        macdHistogram.setDownColor(0xff138b34);
         //设置MACD柱状图组件中柱子是边框型的还是实心的,也就是说是否填充MACD柱子的颜色
         macdHistogram.setFill(true);
         return macdHistogram;
@@ -357,9 +363,9 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置该组件默认起始绘制的下标数
         histogram.setDrawPointIndex(list.size() - histogram.getDefaultShowPointNums());
         //设置涨的颜色
-        histogram.setUpColor(0xfff5515f);
+        histogram.setUpColor(0xffa23c0c);
         //设置跌的颜色
-        histogram.setDownColor(0xff00b78f);
+        histogram.setDownColor(0xff138b34);
         //设置柱状图组件中柱子是边框型的还是实心的,也就是说是否填充柱子的颜色
         histogram.setFill(true);
         return histogram;
@@ -384,9 +390,9 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置该组件默认起始绘制的下标数
         candleLine.setDrawPointIndex(mKDataList.size() - candleLine.getDefaultShowPointNums());
         //设置涨的颜色
-        candleLine.setUpColor(0xfff5515f);
+        candleLine.setUpColor(0xffa23c0c);
         //设置跌的颜色
-        candleLine.setDownColor(0xff00b78f);
+        candleLine.setDownColor(0xff138b34);
         //设置K线组件中蜡烛是边框型蜡烛还是实心的蜡烛,也就是说是否填充蜡烛的颜色
         candleLine.setFill(true);
         //设置K线组件是否显示屏幕中的最高价

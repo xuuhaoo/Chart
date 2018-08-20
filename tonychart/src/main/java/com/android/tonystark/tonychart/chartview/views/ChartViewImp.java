@@ -8,6 +8,8 @@ import android.graphics.Paint;
 import android.graphics.PathEffect;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -698,7 +700,12 @@ public class ChartViewImp extends View implements ChartView {
      * 清理画布
      */
     private void clearCanvas(Canvas canvas) {
-        canvas.drawColor(Color.WHITE);
+        Drawable drawable = getBackground();
+        if (drawable instanceof ColorDrawable) {
+            canvas.drawColor(((ColorDrawable) drawable).getColor());
+        } else {
+            canvas.drawColor(Color.WHITE);
+        }
     }
 
     /**
