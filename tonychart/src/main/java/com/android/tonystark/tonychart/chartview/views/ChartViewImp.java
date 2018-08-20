@@ -18,7 +18,6 @@ import android.view.ViewTreeObserver;
 
 import com.android.didi.crash_lib.CrashManager;
 import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
-import com.android.tonystark.tonychart.chartview.viewbeans.ZoomMoveViewContainer;
 import com.android.tonystark.tonychart.chartview.viewbeans.ChartView;
 import com.android.tonystark.tonychart.chartview.viewbeans.Coordinates;
 import com.android.tonystark.tonychart.chartview.viewbeans.CrossLine;
@@ -707,6 +706,7 @@ public class ChartViewImp extends View implements ChartView {
      */
     public void setCoordinateScaleAdapter(Coordinates.CoordinateScaleAdapter adapter) {
         if (mCoordinates != null) {
+            adapter.setChartView(this);
             mCoordinates.setCoordinateScaleAdapter(adapter);
         }
     }

@@ -1,7 +1,6 @@
 package com.android.tonystark.tonychart.chartview.adapter;
 
 import com.android.tonystark.tonychart.chartview.utils.DataUtils;
-import com.android.tonystark.tonychart.chartview.viewbeans.ChartView;
 import com.android.tonystark.tonychart.chartview.viewbeans.Coordinates;
 import com.android.tonystark.tonychart.chartview.viewbeans.ViewContainer;
 
@@ -9,17 +8,15 @@ import java.util.List;
 
 public class FocusedCoordinateAdapter extends Coordinates.CoordinateScaleAdapter {
 
-    private ChartView mChartView;
 
     private int mKeepNums = 3;
-
-    public FocusedCoordinateAdapter(ChartView chartView) {
-        mChartView = chartView;
-    }
 
     @Override
     public String getYLeftScaleString(List dataList, int drawPointIndex, int showPointNums, int scaleIndex, int totalYScaleNum) {
         String scale = "0";
+        if (mChartView == null) {
+            return scale;
+        }
 
         ViewContainer viewContainer = mChartView.getFocusedView();
 
@@ -49,4 +46,5 @@ public class FocusedCoordinateAdapter extends Coordinates.CoordinateScaleAdapter
     public void setKeepNums(int keepNums) {
         mKeepNums = keepNums;
     }
+
 }

@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
                 //显示调用如下:brokenLine.requestFocus();
                 mChartViewImp.addChild(mPriceLine);
                 //设置主图的坐标系刻度适配器(因为当前聚焦的是折线图,所以坐标系需要展示折线的刻度适配器)
-                mChartViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter(mChartViewImp));
+//                mChartViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter());
                 //得到创建好的组件
                 MACDHistogram macdHistogram = getMACD();
                 //添加组件到副图中
@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置坐标系背景
         mChartViewImp.setCoordinateBackground(0xfff2efef);
         //设置主图的坐标系刻度适配器
-        mChartViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter(mChartViewImp));
+        mChartViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter());
         //设置点击事件
         mChartViewImp.setOnChartViewClickListener(new ChartViewImp.OnChartViewClickListener() {
             @Override
@@ -297,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         //设置坐标系经线(竖着的)个数,包含左边框和右边框
         mChartSubViewImp.setCoordinateLongitudeNum(4);
         //设置主图的坐标系刻度适配器
-        mChartSubViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter(mChartViewImp));
+        mChartSubViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter());
         //设置点击事件
         mChartSubViewImp.setOnChartViewClickListener(new ChartViewImp.OnChartViewClickListener() {
             @Override

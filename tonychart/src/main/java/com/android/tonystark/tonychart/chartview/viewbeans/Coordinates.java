@@ -9,7 +9,6 @@ import android.graphics.PathEffect;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
-
 import com.android.tonystark.tonychart.R;
 import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
 
@@ -289,6 +288,8 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
      */
     public static abstract class CoordinateScaleAdapter<T> {
 
+        protected ChartView mChartView;
+
         /**
          * 为了留一点空间，重新计算最小值
          *
@@ -330,6 +331,11 @@ public class Coordinates extends ViewContainer<Object> implements UnabelFocuseds
          * 得到X轴底部的刻度
          */
         public abstract String getXBottomScaleString(List<T> dataList, int drawPointIndex, int showPointNums, int scaleIndex, int totalXScaleNum);
+
+
+        public void setChartView(ChartView chartView) {
+            mChartView = chartView;
+        }
     }
 
     /**
