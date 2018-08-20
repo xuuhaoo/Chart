@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import android.view.MotionEvent;
 
 import com.android.tonystark.tonychart.chartview.interfaces.UnabelFocusedsView;
-import com.android.tonystark.tonychart.chartview.utils.DataUtils;
 
 import java.util.List;
 
@@ -198,6 +197,7 @@ public class CrossLine extends ZoomMoveViewContainer<String> implements UnabelFo
                 y = mFingerPointF.y;
             }
         }
+        y = y < 0 ? 0 : (y > mCoordinateHeight ? mCoordinateHeight : y);
         mCrossPointF.y = y;
         canvas.drawLine(mCoordinateMarginLeft, y, mCoordinateWidth, y, mLinePaint);
     }
@@ -208,6 +208,7 @@ public class CrossLine extends ZoomMoveViewContainer<String> implements UnabelFo
         if (isLongitudeFollowData) {
             x = index * mPointWidth + mCoordinateMarginLeft + mSinglePointOffset;
         }
+        x = x < mCoordinateMarginLeft ? mCoordinateMarginLeft : (x > mCoordinateWidth ? mCoordinateWidth : x);
         mCrossPointF.x = x;
         canvas.drawLine(x, 0, x, mCoordinateHeight, mLinePaint);
     }
@@ -226,13 +227,21 @@ public class CrossLine extends ZoomMoveViewContainer<String> implements UnabelFo
         } catch (NumberFormatException e) {
             y = mFingerPointF.y;
         }
+        y = y < 0 ? 0 : (y > mCoordinateHeight ? mCoordinateHeight : y);
+        x = x < mCoordinateMarginLeft ? mCoordinateMarginLeft : (x > mCoordinateWidth ? mCoordinateWidth : x);
+
         mCrossPointF.y = y;
         mCrossPointF.x = x;
 
         canvas.drawCircle(x, y, mRadius, mPointPaint);
     }
 
-    //绘制纬线刻度
+    /**
+     * 绘制纬线刻度,不更新mCrossPoint
+     *
+     * @param canvas
+     * @param index
+     */
     private void drawLatitudeScaleText(Canvas canvas, int index, float currentValue) {
         if (mOnCrossLineMoveListener == null) {
             return;
@@ -245,33 +254,42 @@ public class CrossLine extends ZoomMoveViewContainer<String> implements UnabelFo
                 y = mFingerPointF.y;
             }
         }
-        mCrossPointF.y = y;
         String indicateValue = mOnCrossLineMoveListener.onCrossIndicateYScale(index, mDrawPointIndex, mShownPointNums, mYMin, mYMax);
         if (TextUtils.isEmpty(indicateValue)) {
             return;
         }
         //文字高度
-        float height = getTextHeight();
+        float textHeight = getTextHeight();
+        //文字框子最小高度
+        float minHeight = textHeight + getPixelDp(mPaddingVerticalDP) * 2;
+        //因为框子是在线中央的
+        minHeight -= minHeight / 2f;
+        //文字框子的最大高度
+        float maxHeight = mCoordinateHeight - minHeight;
+        y = y < minHeight ? minHeight : (y > maxHeight ? maxHeight : y);
         //计算背景宽高
         RectF roundBg = new RectF();
         roundBg.left = mSpace;
         roundBg.top = y;
         roundBg.right = roundBg.left + mTextPaint.measureText(indicateValue) + getPixelDp(mPaddingHorizontalDP) * 2;
-        roundBg.bottom = roundBg.top + height + getPixelDp(mPaddingVerticalDP) * 2;
+        roundBg.bottom = roundBg.top + textHeight + getPixelDp(mPaddingVerticalDP) * 2;
+
         //保证线在这个矩形中间
         float recHeight = roundBg.height();
         roundBg.top -= recHeight / 2;
         roundBg.bottom -= recHeight / 2;
+
+
         //绘制背景
         if (isShowTextBackground) {
             canvas.drawRoundRect(roundBg, mCornerRoundRadius, mCornerRoundRadius, mTextBgPaint);
         }
         //绘制文字
-        canvas.drawText(indicateValue, roundBg.left + getPixelDp(mPaddingHorizontalDP), roundBg.top + getPixelDp(mPaddingVerticalDP) / 2 + height, mTextPaint);
+        canvas.drawText(indicateValue, roundBg.left + getPixelDp(mPaddingHorizontalDP), roundBg.top + getPixelDp(mPaddingVerticalDP) / 2 + textHeight, mTextPaint);
     }
 
     /**
-     * 绘制经线刻度
+     * 绘制经线刻度,不更新mCrossPoint
      *
      * @param canvas
      * @param index
@@ -284,19 +302,24 @@ public class CrossLine extends ZoomMoveViewContainer<String> implements UnabelFo
         if (isLongitudeFollowData) {
             x = index * mPointWidth + mCoordinateMarginLeft + mSinglePointOffset;
         }
-        mCrossPointF.x = x;
         String indicateValue = mOnCrossLineMoveListener.onCrossIndicateXScale(index, mDrawPointIndex, mShownPointNums);
         if (TextUtils.isEmpty(indicateValue)) {
             return;
         }
         //文字高度
-        float height = getTextHeight();
+        float textHeight = getTextHeight();
+        //最小x
+        float minLeft = (mTextPaint.measureText(indicateValue) + getPixelDp(mPaddingHorizontalDP) * 2);
+        minLeft -= minLeft / 2f;
+        //最大x
+        float maxLeft = mCoordinateWidth - minLeft;
+        x = x < minLeft ? minLeft : (x > maxLeft ? maxLeft : x);
         //计算背景宽高
         RectF roundBg = new RectF();
         roundBg.left = x;
         roundBg.top = mCoordinateHeight;
         roundBg.right = roundBg.left + mTextPaint.measureText(indicateValue) + getPixelDp(mPaddingHorizontalDP) * 2;
-        roundBg.bottom = roundBg.top + height + getPixelDp(mPaddingVerticalDP) * 2;
+        roundBg.bottom = roundBg.top + textHeight + getPixelDp(mPaddingVerticalDP) * 2;
         //保证线在这个矩形中间
         float recWidth = roundBg.width();
         roundBg.left -= recWidth / 2;
@@ -306,7 +329,7 @@ public class CrossLine extends ZoomMoveViewContainer<String> implements UnabelFo
             canvas.drawRoundRect(roundBg, mCornerRoundRadius, mCornerRoundRadius, mTextBgPaint);
         }
         //绘制文字
-        canvas.drawText(indicateValue, roundBg.left + getPixelDp(mPaddingHorizontalDP), roundBg.top + getPixelDp(mPaddingVerticalDP) / 2 + height, mTextPaint);
+        canvas.drawText(indicateValue, roundBg.left + getPixelDp(mPaddingHorizontalDP), roundBg.top + getPixelDp(mPaddingVerticalDP) / 2 + textHeight, mTextPaint);
     }
 
     /**
@@ -339,6 +362,7 @@ public class CrossLine extends ZoomMoveViewContainer<String> implements UnabelFo
             case MotionEvent.ACTION_MOVE:
                 mFingerPointF.x = event.getX();
                 mFingerPointF.x = mFingerPointF.x < mCoordinateMarginLeft ? mCoordinateMarginLeft : mFingerPointF.x;
+                mFingerPointF.x = mFingerPointF.x > mCoordinateWidth ? mCoordinateWidth : mFingerPointF.x;
                 index = (int) ((mFingerPointF.x - mCoordinateMarginLeft) / mPointWidth);
                 if (mFocusedView.getDataListSize() > 0 && index > mFocusedView.getDataListSize() - 1) {
                     index = mFocusedView.getDataListSize() - 1;

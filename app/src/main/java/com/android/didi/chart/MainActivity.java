@@ -2,16 +2,15 @@ package com.android.didi.chart;
 
 import android.graphics.DashPathEffect;
 import android.graphics.PointF;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.tonystark.tonychart.chartview.adapter.FocusedCoordinateAdapter;
-import com.android.tonystark.tonychart.chartview.viewbeans.ZoomMoveViewContainer;
 import com.android.tonystark.tonychart.chartview.viewbeans.BrokenLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.CandleLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.Coordinates;
@@ -20,12 +19,12 @@ import com.android.tonystark.tonychart.chartview.viewbeans.Histogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.IndicatorLine;
 import com.android.tonystark.tonychart.chartview.viewbeans.MACDHistogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.ViewContainer;
+import com.android.tonystark.tonychart.chartview.viewbeans.ZoomMoveViewContainer;
 import com.android.tonystark.tonychart.chartview.views.ChartViewImp;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.xuhao.android.libsocket.sdk.OkSocket;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -240,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         crossLine.setOnCrossLineMoveListener(this);
         //设置纬线不跟数据
         crossLine.setLatitudeFollowData(false);
+        crossLine.setLongitudeFollowData(false);
     }
 
     private void initSubCrossLine() {
@@ -554,12 +554,12 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
 
     @Override
     public String onCrossIndicateYScale(int crossIndexInScreen, int drawPointIndex, int showPointNums, float yMin, float yMax) {
-        return 300 + "";
+        return 30000 + "";
     }
 
     @Override
     public String onCrossIndicateXScale(int crossIndexInScreen, int drawPointIndex, int showPointNums) {
-        return 200 + "";
+        return "2018.1.2.3.4.5.6.7.8.9.0.123.456";
     }
 
 
