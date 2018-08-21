@@ -86,8 +86,6 @@ public class DataUtils {
 
         if (isRound) {
             format.setRoundingMode(RoundingMode.HALF_UP);
-        } else {
-            format.setRoundingMode(RoundingMode.FLOOR);
         }
 
         result = format.format(in);
