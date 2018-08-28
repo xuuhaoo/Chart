@@ -20,7 +20,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:26.1.0'
-//    api 'com.tonystark.android:chart:0.0.9'
+//    api 'com.tonystark.android:chart:1.2.6'
 
     compile project(':tonychart')
     compile 'com.google.code.gson:gson:2.8.0'

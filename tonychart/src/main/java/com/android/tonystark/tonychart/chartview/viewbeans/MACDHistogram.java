@@ -98,17 +98,14 @@ public class MACDHistogram extends ZoomMoveViewContainer<MACDHistogram.MACDBean>
         PointF pointF = new PointF();
         mSpace = mPointWidth / 7;
 
-        if (mDataList.size() - 1 >= index) {
-            float x = index * mPointWidth + mSpace + mCoordinateMarginLeft;
-            float y = (1f - (0 - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+        float x = index * mPointWidth + mSpace + mCoordinateMarginLeft;
+        float zeroY = (1f - (0 - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+        float y = zeroY;
 
-            if (bean.getMacd() > 0) {
-                y = (1f - bean.getMacd() / (mYMax)) * y;
-            }
-            pointF.set(x, y);
-        } else {
-            pointF.set(0, 0);
+        if (bean.getMacd() > 0) {
+            y = (1f - (bean.getMacd() - 0) / (mYMax - 0)) * zeroY;
         }
+        pointF.set(x, y);
         return pointF;
     }
 
@@ -116,11 +113,13 @@ public class MACDHistogram extends ZoomMoveViewContainer<MACDHistogram.MACDBean>
         PointF pointF = new PointF();
         mPointWidth = (mCoordinateWidth - mCoordinateMarginLeft) / mShownPointNums;
         mSpace = mPointWidth / 7;
+
         float x = (index + 1) * mPointWidth - mSpace + mCoordinateMarginLeft;
-        float y = (1f - (0 - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+        float zeroY = (1f - (0 - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+        float y = zeroY;
 
         if (bean.getMacd() < 0) {
-            y = (1f - bean.getMacd() / (-mYMin)) * y;
+            y = (bean.getMacd() / mYMin) * (mCoordinateHeight - zeroY) + zeroY;
         }
         pointF.set(x, y);
         return pointF;
