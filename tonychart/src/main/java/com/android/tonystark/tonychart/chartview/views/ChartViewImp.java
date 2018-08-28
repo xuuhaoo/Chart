@@ -709,6 +709,20 @@ public class ChartViewImp extends View implements ChartView {
     }
 
     /**
+     * 获得坐标系的高度
+     */
+    public float getCoordinateHeight() {
+        return mCoordinateRectF.height();
+    }
+
+    /**
+     * 获得坐标系的宽度
+     */
+    public float getCoordinateWidth() {
+        return mCoordinateRectF.width();
+    }
+
+    /**
      * 设置坐标系刻度适配器
      */
     public void setCoordinateScaleAdapter(Coordinates.CoordinateScaleAdapter adapter) {
