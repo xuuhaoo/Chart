@@ -28,13 +28,6 @@ public class FocusedCoordinateAdapter extends Coordinates.CoordinateScaleAdapter
 
         float decrease = (max - min) / (totalYScaleNum - 1);//递减量
         scale = (max - (decrease * scaleIndex)) + "";
-        boolean isOdd = totalYScaleNum % 2 != 0;
-        if (viewContainer instanceof MACDHistogram && isOdd) {
-            int middleIndex = (totalYScaleNum - 1) / 2;
-            if (scaleIndex == middleIndex) {
-                scale = 0.00000000 + "";
-            }
-        }
 
         return DataUtils.format(scale, mKeepNums, false);
     }

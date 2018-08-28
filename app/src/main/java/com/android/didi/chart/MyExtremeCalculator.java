@@ -20,24 +20,12 @@ public class MyExtremeCalculator implements ViewContainer.ExtremeCalculatorInter
     }
 
     @Override
-    public float onCalculateMax(int drawPointIndex, int showPointNums) {
+    public float[] onCalculateExtreme(int drawPointIndex, int showPointNums) {
         fetchAllData(drawPointIndex, showPointNums);
         if (!mDataInRanged.isEmpty()) {
-            float[] extreme = DataUtils.getExtremeNumber(mDataInRanged);
-            return extreme[1];
+            return DataUtils.getExtremeNumber(mDataInRanged);
         }
-        return 0;
-    }
-
-    @Override
-    public float onCalculateMin(int drawPointIndex, int showPointNums) {
-        fetchAllData(drawPointIndex, showPointNums);
-        if (!mDataInRanged.isEmpty()) {
-            float[] extreme = DataUtils.getExtremeNumber(mDataInRanged);
-            return extreme[0];
-        }
-
-        return 0;
+        return new float[]{0, 0};
     }
 
     private void fetchAllData(int drawPointIndex, int showPointNums) {

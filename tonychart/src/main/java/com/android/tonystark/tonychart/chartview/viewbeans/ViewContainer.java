@@ -564,9 +564,7 @@ public class ViewContainer<T extends Object> {
     }
 
     public interface ExtremeCalculatorInterface {
-        float onCalculateMax(int drawPointIndex, int showPointNums);
-
-        float onCalculateMin(int drawPointIndex, int showPointNums);
+        float[] onCalculateExtreme(int drawPointIndex, int showPointNums);
     }
 
 }

@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.RectF;
 
 import com.android.tonystark.tonychart.chartview.utils.DataUtils;
 
@@ -62,6 +63,9 @@ public class MACDHistogram extends ZoomMoveViewContainer<MACDHistogram.MACDBean>
                     MACDBean bean = mDataList.get(i + mDrawPointIndex);
                     leftTopPoint = getLeftTopPoint(i, bean);
                     rightBottomPoint = getRightBottomPoint(i, bean);
+
+
+                    RectF rectF = new RectF();
                     if (bean.getMacd() > 0) {
                         mFillPaint.setColor(mUpColor);
                     } else if (bean.getMacd() < 0) {
@@ -69,9 +73,15 @@ public class MACDHistogram extends ZoomMoveViewContainer<MACDHistogram.MACDBean>
                     } else {
                         mFillPaint.setColor(mEvenColor);
                     }
+
+                    rectF.left = leftTopPoint.x;
+                    rectF.top = leftTopPoint.y;
+                    rectF.right = rightBottomPoint.x;
+                    rectF.bottom = rightBottomPoint.y;
+
                     //画实心
                     if (isFill) {
-                        canvas.drawRect(leftTopPoint.x, leftTopPoint.y, rightBottomPoint.x, rightBottomPoint.y, mFillPaint);
+                        canvas.drawRect(rectF, mFillPaint);
                     } else {
                         float width = leftTopPoint.x - rightBottomPoint.x;
                         canvas.drawLine(leftTopPoint.x - width / 2f, leftTopPoint.y, rightBottomPoint.x + width / 2f, rightBottomPoint.y, mFillPaint);
@@ -90,9 +100,10 @@ public class MACDHistogram extends ZoomMoveViewContainer<MACDHistogram.MACDBean>
 
         if (mDataList.size() - 1 >= index) {
             float x = index * mPointWidth + mSpace + mCoordinateMarginLeft;
-            float y = mCoordinateHeight / 2;
+            float y = (1f - (0 - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+
             if (bean.getMacd() > 0) {
-                y = (1f - bean.getMacd() / (mYMax)) * mCoordinateHeight / 2;
+                y = (1f - bean.getMacd() / (mYMax)) * y;
             }
             pointF.set(x, y);
         } else {
@@ -106,9 +117,10 @@ public class MACDHistogram extends ZoomMoveViewContainer<MACDHistogram.MACDBean>
         mPointWidth = (mCoordinateWidth - mCoordinateMarginLeft) / mShownPointNums;
         mSpace = mPointWidth / 7;
         float x = (index + 1) * mPointWidth - mSpace + mCoordinateMarginLeft;
-        float y = mCoordinateHeight / 2;
+        float y = (1f - (0 - mYMin) / (mYMax - mYMin)) * mCoordinateHeight;
+
         if (bean.getMacd() < 0) {
-            y = (1f - bean.getMacd() / (- mYMin)) * mCoordinateHeight / 2;
+            y = (1f - bean.getMacd() / (-mYMin)) * y;
         }
         pointF.set(x, y);
         return pointF;
@@ -181,9 +193,7 @@ public class MACDHistogram extends ZoomMoveViewContainer<MACDHistogram.MACDBean>
     @Override
     public float[] calculateExtremeY() {
         if (mExtremeCalculatorInterface != null) {
-            float yMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-            float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
-            return new float[]{yMin, yMax};
+            return mExtremeCalculatorInterface.onCalculateExtreme(mDrawPointIndex, mShownPointNums);
         } else if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             List<String> dataList = new ArrayList<>();
             for (int i = mDrawPointIndex + 1; i < mDrawPointIndex + mShownPointNums && i < mDataList.size(); i++) {

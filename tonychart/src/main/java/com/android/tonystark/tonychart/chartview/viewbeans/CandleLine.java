@@ -242,9 +242,7 @@ public class CandleLine extends ZoomMoveViewContainer<CandleLine.CandleLineBean>
     @Override
     public float[] calculateExtremeY() {
         if (mExtremeCalculatorInterface != null) {
-            float yMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-            float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
-            return new float[]{yMin, yMax};
+            return mExtremeCalculatorInterface.onCalculateExtreme(mDrawPointIndex, mShownPointNums);
         } else if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             float min = mDataList.get(mDrawPointIndex).getLowPrice();
             float max = mDataList.get(mDrawPointIndex).getHeightPrice();

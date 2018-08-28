@@ -182,8 +182,7 @@ public class Histogram extends ZoomMoveViewContainer<Histogram.HistogramBean> {
     @Override
     public float[] calculateExtremeY() {
         if (mExtremeCalculatorInterface != null) {
-            float yMax = mExtremeCalculatorInterface.onCalculateMax(mDrawPointIndex, mShownPointNums);
-//            float yMin = mExtremeCalculatorInterface.onCalculateMin(mDrawPointIndex, mShownPointNums);
+            float yMax = mExtremeCalculatorInterface.onCalculateExtreme(mDrawPointIndex, mShownPointNums)[1];
             return new float[]{0, yMax};
         } else if (mDataList != null && mDataList.size() > mDrawPointIndex) {
             List<String> dataList = new ArrayList<>();
