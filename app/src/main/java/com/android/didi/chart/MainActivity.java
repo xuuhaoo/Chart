@@ -299,9 +299,9 @@ public class MainActivity extends AppCompatActivity implements CrossLine.OnCross
         mChartSubViewImp.setCoordinateBackground(0xff111419);
         mChartSubViewImp.setBackgroundColor(0xff111419);
         //设置坐标系纬线(横着的)个数,包含顶边框和底边框
-        mChartSubViewImp.setCoordinateLatitudeNum(2);
+        mChartSubViewImp.setCoordinateLatitudeNum(3);
         //设置坐标系经线(竖着的)个数,包含左边框和右边框
-        mChartSubViewImp.setCoordinateLongitudeNum(4);
+        mChartSubViewImp.setCoordinateLongitudeNum(5);
         //设置主图的坐标系刻度适配器
         mChartSubViewImp.setCoordinateScaleAdapter(new FocusedCoordinateAdapter());
         //设置点击事件

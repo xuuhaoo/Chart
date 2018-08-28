@@ -2,6 +2,7 @@ package com.android.tonystark.tonychart.chartview.adapter;
 
 import com.android.tonystark.tonychart.chartview.utils.DataUtils;
 import com.android.tonystark.tonychart.chartview.viewbeans.Coordinates;
+import com.android.tonystark.tonychart.chartview.viewbeans.MACDHistogram;
 import com.android.tonystark.tonychart.chartview.viewbeans.ViewContainer;
 
 import java.util.List;
@@ -26,11 +27,16 @@ public class FocusedCoordinateAdapter extends Coordinates.CoordinateScaleAdapter
         float max = extreme[1];
 
         float decrease = (max - min) / (totalYScaleNum - 1);//递减量
-        for (int i = 0; i <= scaleIndex; i++) {
-            scale = (max - (decrease * i)) + "";
+        scale = (max - (decrease * scaleIndex)) + "";
+        boolean isOdd = totalYScaleNum % 2 != 0;
+        if (viewContainer instanceof MACDHistogram && isOdd) {
+            int middleIndex = (totalYScaleNum - 1) / 2;
+            if (scaleIndex == middleIndex) {
+                scale = 0.00000000 + "";
+            }
         }
 
-        return DataUtils.format(scale, mKeepNums, true);
+        return DataUtils.format(scale, mKeepNums, false);
     }
 
     @Override

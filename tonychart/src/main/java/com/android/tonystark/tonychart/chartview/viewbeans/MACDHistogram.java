@@ -92,7 +92,7 @@ public class MACDHistogram extends ZoomMoveViewContainer<MACDHistogram.MACDBean>
             float x = index * mPointWidth + mSpace + mCoordinateMarginLeft;
             float y = mCoordinateHeight / 2;
             if (bean.getMacd() > 0) {
-                y = (1f - bean.getMacd() / (mYMax - mYMin)) * mCoordinateHeight / 2;
+                y = (1f - bean.getMacd() / (mYMax)) * mCoordinateHeight / 2;
             }
             pointF.set(x, y);
         } else {
@@ -108,7 +108,7 @@ public class MACDHistogram extends ZoomMoveViewContainer<MACDHistogram.MACDBean>
         float x = (index + 1) * mPointWidth - mSpace + mCoordinateMarginLeft;
         float y = mCoordinateHeight / 2;
         if (bean.getMacd() < 0) {
-            y = (1f - bean.getMacd() / (mYMax - mYMin)) * mCoordinateHeight / 2;
+            y = (1f - bean.getMacd() / (- mYMin)) * mCoordinateHeight / 2;
         }
         pointF.set(x, y);
         return pointF;
